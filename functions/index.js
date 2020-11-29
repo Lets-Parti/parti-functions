@@ -3,10 +3,6 @@ const admin = require('firebase-admin')
 const express = require('express')
 const firebase = require('firebase')
 
-admin.initializeApp()
-const db = admin.firestore() 
-const app = express()
-
 const firebaseConfig = {
     apiKey: "AIzaSyAJvJxSfr3WrfxpHLVnEhfoPl_o3BdfRcM",
     authDomain: "lets-parti.firebaseapp.com",
@@ -19,6 +15,27 @@ const firebaseConfig = {
   };
 
 firebase.initializeApp(firebaseConfig)
+admin.initializeApp()
+
+const db = admin.firestore()                                                //Firestore database object 
+const app = express()   
+
+const stringIsEmpty = (string) =>                                           //Check if string is empty
+{   
+    return String(string).length <= 0
+}
+
+const isZipcode = (zipcode) =>
+{
+    const regex = /^[0-9]{5}(?:-[0-9]{4})?$/;
+    return regex.test(String(zipcode))
+}
+
+const isEmail = (email) =>                                                  //Check if it's a valid email
+{
+    const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(String(email).toLowerCase()) 
+}
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -67,41 +84,75 @@ app.post('/createEvent', (request, response) =>
         })
 })
 
-//Signup Route
-let token, userId
+
+
+// URL: /api/signup
+// TYPE: POST request 
+// JSON: 
+// {
+// 	"email": "example@example.com",
+// 	"password": "pass123", 
+// 	"confirmPassword": "pass123",
+// 	"userHandle": "example",
+// 	"type": "client",
+// 	"zipcode": "12345"
+// }
 app.post('/signup', (request, response) =>
 {
+    let token
+    let userUID
     const newUser = {
         email: request.body.email, 
         password: request.body.password, 
-        confirmPassword: request.body.confirmPassword, 
-        handle: request.body.handle
+        confirmPassword: request.body.confirmPassword,
+        userHandle: request.body.userHandle, 
+        type: request.body.type, 
+        zipcode: request.body.zipcode
     }
 
-    //TODO: Validate
-    const path = '/users/' + newUser.handle 
+    errors = {}
+    if(!isEmail(newUser.email))
+        errors.email = 'Invalid email format'
+    if(stringIsEmpty(newUser.userHandle))
+        errors.userHandle = 'User handle cannot be empty'
+    if(!isZipcode(newUser.zipcode))
+        errors.zipcode = 'Invalid zipcode format'
+    if(newUser.type !== 'client' && newUser.type !== 'service')
+        errors.type = 'Type must be type client or service'
+    if(newUser.password !== newUser.confirmPassword)
+        errors.password = 'Passwords must match'
 
-    db.doc(path).get()
+    if(Object.keys(errors).length > 0)
+        return response.status(400).json(errors)
+
+
+    const dbPath = `/users/${newUser.userHandle}`
+    db.doc(dbPath).get()
     .then(doc => {
-        if(doc.exists){
-            return response.status(400).json({handle: 'this handle is already taken'})
+        if(doc.exists){                                 
+            return response.status(400).json({handle: `Handle ${newUser.userHandle} already exists`})
         } else {
             return firebase.auth().createUserWithEmailAndPassword(newUser.email, newUser.password)
         }
     })
     .then(data => {
-        userId = data.user.uid
+        userUID = data.user.uid
         return data.user.getIdToken()
     })
     .then(idToken => {
         token = idToken
-        const userCredentials = {
-            handle: newUser.handle, 
+
+        const userInfoToDatabase = {
+            userID: userUID,
             email: newUser.email, 
+            userHandle: newUser.userHandle, 
+            zipcode: newUser.zipcode,
+            type: newUser.type, 
             createdAt: new Date().toISOString(), 
-            userId: userId
+            events: []
         }
-        return db.doc(path).set(userCredentials)
+
+        return db.doc(dbPath).set(userInfoToDatabase)
     })
     .then(() => {
         return response.status(201).json({token})
@@ -109,7 +160,7 @@ app.post('/signup', (request, response) =>
     .catch(error => {
         console.error(error) 
         if(error.code === 'auth/email-already-in-use'){
-            return response.status(400).json({email: 'Email is already in use'})
+            return response.status(400).json({email: `Email ${newUser.email} is already in use`})
         }else {
             return response.status(500).json({error: error.code})
         }
