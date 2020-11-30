@@ -19,6 +19,7 @@ exports.signup = (request, response) =>
         type: request.body.type, 
         zipcode: request.body.zipcode
     };
+    
     console.log(newUser); 
     errors = {};
     if(!isEmail(newUser.email))
