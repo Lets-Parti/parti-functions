@@ -19,7 +19,7 @@ exports.signup = (request, response) =>
         type: request.body.type, 
         zipcode: request.body.zipcode
     };
-    
+
     console.log(newUser); 
     errors = {};
     if(!isEmail(newUser.email))
@@ -124,6 +124,11 @@ exports.login = (request, response) =>
 exports.getUser = (request, response) =>
 {
     const userHandle = request.body.userHandle; 
+    if(userHandle.length == 0)
+    {
+        return response.status(500).json({error: 'User handle cannot be empty'});
+    }
+
     const dbPath = `/users/${userHandle}`;
 
     db.doc(dbPath).get()
