@@ -1,6 +1,6 @@
-exports.stringIsEmpty = (string) =>                                           //Check if string is empty
+exports.isEmpty = (string) =>                                           //Check if string is empty
 {   
-    return String(string).length <= 0
+    return string.length == 0; 
 }
 
 exports.isZipcode = (zipcode) =>
@@ -9,6 +9,7 @@ exports.isZipcode = (zipcode) =>
     return regex.test(String(zipcode))
 }
 
+//Check if string email is a type email 
 exports.isEmail = (email) =>                                                  //Check if it's a valid email
 {
     const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

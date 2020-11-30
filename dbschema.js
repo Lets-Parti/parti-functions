@@ -7,23 +7,48 @@ let CloudFirestoreDB =
             userID: 'biEX5dBoj4eAPpTn1LCsB3iDQE13', 
             email: 'matt@gmail.com',
             userHandle: 'matt8p',
+            fullName: 'Matthew Wang',
             type: 'client',                                                //Either a client or service account 
             createdAt: '2020-11-28T22:06:14.024Z', 
-            //imageUrl: 'image/whatever/whatever',
-            //bio: 'Hey, my name is matthew',
-            events: [aX1238Ddfs],                                          //Arraylist of events 
+            imageUrl: 'image/whatever/whatever',
+            events: ['aX1238Ddfs'],                                          //Arraylist of events 
             zipcode: '85286'
+        },
+
+        {
+            userID: 'biEX5dBoj4eAPpTn1LCsB3iDQE13', 
+            email: '808hertz@gmail.com',
+            userHandle: 'matt8p',
+            fullName: 'Matthew Wang',
+            type: 'service',                                                //Either a client or service account 
+            createdAt: '2020-11-28T22:06:14.024Z', 
+            imageUrl: 'image/whatever/whatever',
+            bio: '808Hertz is the best entertainment service',                                  //Arraylist of events 
+            zipcode: '85286',
+            reviews: {
+                numberOfReviews: 1, 
+                averageStars: 5, 
+                reviews: [
+                    {
+                        userHandle: 'matt8p',
+                        stars: 5, 
+                        comment: '808Hertz did a fantastic job at my anniversary'
+                    }
+                ]
+            }
         }
+
+
     ],
 
     events: [
         {
-            userHandle: 'matt8p',                                           //userHandle of the person who created the event 
-            createdAt: '2020-11-28T22:06:14.024Z',      
+            createdAt: '2020-11-28T22:06:14.024Z',  
             title: 'Matts 20th Birthday Party', 
             description: 'Its going to be the best birthday party!', 
             eventDate: '2020-12-31T00:00:00',
             zipcode: '85286', 
+            userHandle: 'matt8p',  
 
             services: [
                 {
@@ -31,7 +56,7 @@ let CloudFirestoreDB =
                     description: 'I need a DJ for my party', 
                     vendorFound: true, 
                     service: {
-                        userID: '{userHandle of the vendor}',
+                        userHandle: '{userHandle of the vendor}',
                         contract: '{contractID}'
                     }
                 }, 
@@ -46,6 +71,16 @@ let CloudFirestoreDB =
     ],
 
     contracts: [
-        //TODO: Figure out contract structure 
+        {
+            userHandle: `${userHandle}`,
+            createdAt: '2020-11-28T22:07:14',
+            event: `${eventID}`,
+            approved: '', 
+            price: 500, 
+            details: 'Will DJ at the event from 8Am to 9pm ',
+            service: {
+                userHandle: `${userHandle}`
+            }
+        }
     ] 
 }
