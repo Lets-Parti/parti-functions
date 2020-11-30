@@ -27,19 +27,19 @@ let CloudFirestoreDB =
 
             services: [
                 {
-                    service: 'DJ',
+                    serviceType: 'DJ',
                     description: 'I need a DJ for my party', 
                     vendorFound: true, 
-                    vendor: {
-                        userID: '{userID of the vendor}',
-                        contractID: '{contractID}'
+                    service: {
+                        userID: '{userHandle of the vendor}',
+                        contract: '{contractID}'
                     }
                 }, 
                 {
-                    service: 'Photography',
+                    serviceType: 'Photography',
                     description: 'I need a Photographer for my party',
                     vendorFound: false, 
-                    vendor: {}
+                    service: {}
                 }
             ]
         }
