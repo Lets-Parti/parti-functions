@@ -40,7 +40,9 @@ exports.getEventByID = (request, response) =>
         let events = [] 
         data.forEach((doc) =>
         {
-            events.push(doc.data()); 
+            let thisDocumentData = doc.data(); 
+            thisDocumentData.eventID = doc.id; 
+            events.push(thisDocumentData); 
         })
         return response.json(events); 
     })
