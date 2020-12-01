@@ -142,9 +142,9 @@ Example Response:
 }
 ```
 
-## GET: `/events`
+## POST: `/events/user`
 
-Call the `/events` API to get a list of all of the events in the database. It will return all events sorted by `"createdAt"` field.
+Call the `/events/user` API to get a list of all of the events for a given user. A Bearer token is required to specify who the user is.
 
 Return structure:
 

@@ -1,30 +1,46 @@
 const {db} = require('../util/admin');
 
-exports.getAllEvents = (request, response) =>
+exports.getUsersEvents = (request, response) =>
 {
-    db.collection('events')
-    .orderBy('createdAt', 'desc')
+    const userHandle = request.user.userHandle; 
+    const dbPath = `/users/${userHandle}`;
+
+    db.doc(dbPath)
     .get()
-    .then((data) =>
+    .then(doc =>
     {
-        let events = []
-        data.forEach((doc) =>
+        if(!doc.exists)
         {
-            events.push({ 
-                eventID: doc.id, 
-                title: doc.data().title, 
-                description: doc.data().description, 
-                createdAt: doc.data().createdAt,
-                eventDate: doc.data().eventDate, 
-                zipcode: doc.data().zipcode,
-                services: doc.data().services
+            return response.status(500).json({error: `Database path ${dbPath} does not exist `});
+        }else
+        {
+            const eventIDs = doc.data().events; 
+
+            db.collection('events')
+            .where('__name__', 'in', eventIDs)
+            .get()
+            .then((data) =>
+            {
+                let events = [] 
+                data.forEach((doc) =>
+                {
+                    let thisDocumentData = doc.data(); 
+                    thisDocumentData.eventID = doc.id; 
+                    events.push(thisDocumentData); 
+                })
+                return response.json(events); 
             })
-        })
-        return response.json(events)
-    }).catch((err) => 
+            .catch(err =>
+            {
+                console.error(err.code); 
+                return response.status(500).json({error: `Could not retrieve events for event ids ${eventIDs}`});
+            })
+        }
+    })
+    .catch(err =>
     {
-        console.error(err.code)
-        return response.status(500).json({error: `Could not retrieve events ${err.code}`});
+        console.error(err.code); 
+        return response.status(500).json({error: `Could not find events for ${userHandle}`});
     })
 }
 
@@ -52,7 +68,6 @@ exports.getEventByID = (request, response) =>
         return response.status(500).json({error: `Could not retrieve events for ids ${eventIDs}`});
     })
 }
-
 
 exports.createEvent = (request, response) => 
 {
