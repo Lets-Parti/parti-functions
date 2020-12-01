@@ -8,7 +8,7 @@ To visualize the structure of the database, check out the file `dbschema.js`
 
 ## POST: `/signup`
 
-This endpoint will create a new account. No authorization is needed to run this endpoint. The POST Request body must contain the following parameters:
+**Create a new account and return token**. No authorization is needed to run this endpoint. The POST Request body must contain the following parameters:
 
 `[userHandle, fullName, email, password, confirmPassword, type, zipcode]`
 
@@ -39,7 +39,7 @@ The endpoint response is the user's bearer token.
 
 ## POST: `/login`
 
-This endpoint will validate a login. No authorization is needed to run this endpoint. The POST request body must contain the following parameters:
+**Validate a login and return token**. No authorization is needed to run this endpoint. The POST request body must contain the following parameters:
 
 `[email, password]`
 
@@ -64,7 +64,7 @@ If successful, the response will return the user's bearer token.
 
 ## POST: `/user`
 
-This endpoint will retrieve the data of a given userHandle. The POST request body must contain the following parameters:
+**Retrieve user info of a given handle**. The POST request body must contain the following parameters:
 
 `[userHandle]`
 
@@ -96,7 +96,7 @@ If successfull the response will return the user's basic information
 
 ## POST: `/user/image`
 
-This endpoint will retrieve a photo file of type png or jpg, upload it to Firebase storage, and save the photo url to the user's profile. POST request body must contain authentication through Bearer token.
+**Upload a jpg or png file as user's profile image**. POST request body must contain authentication through Bearer token.
 
 **Upload the photo through url encoded**
 
@@ -113,7 +113,7 @@ If successful, the response will return:
 
 ## POST: `/events`
 
-Creates a new event. In order to use this endpoint, you must authorize with a bearer token given through login. This will create a new event in the Firestore database.
+**Creates a new event**. In order to use this endpoint, you must authorize with a bearer token given through login. This will create a new event in the Firestore database.
 
 Example Body:
 
@@ -144,7 +144,7 @@ Example Response:
 
 ## POST: `/events/user`
 
-Call the `/events/user` API to get a list of all of the events for a given user. A Bearer token is required to specify who the user is.
+**Get the list of events of a given user**. A Bearer token is required to specify who the user is.
 
 Return structure:
 
@@ -187,7 +187,7 @@ Return structure:
 
 ## POST: `/events/id`
 
-Retrieve a list of events by the form ID. No authorization needed.
+**Get a list of events by eventID**. No authorization needed.
 
 To retrieve a list of events by ID, pass an **array** of ids. Example body:
 

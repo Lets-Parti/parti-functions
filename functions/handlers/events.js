@@ -2,6 +2,9 @@ const {db} = require('../util/admin');
 
 exports.getUsersEvents = (request, response) =>
 {
+    if(request.user.type !== 'client')
+        return response.status(500).json({error: 'Must be of type client to get the users events'});
+
     const userHandle = request.user.userHandle; 
     const dbPath = `/users/${userHandle}`;
 
