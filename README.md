@@ -109,6 +109,8 @@ If successful, the response will return:
 }
 ```
 
+# `Events` Route API's
+
 ## POST: `/events`
 
 Creates a new event. In order to use this endpoint, you must authorize with a bearer token given through login. This will create a new event in the Firestore database.
