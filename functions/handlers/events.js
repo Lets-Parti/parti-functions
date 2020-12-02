@@ -1,4 +1,5 @@
 const {db} = require('../util/admin');
+const {isEmpty, isZipcode} = require('../util/validators');
 
 exports.getUsersEvents = (request, response) =>
 {
@@ -87,6 +88,17 @@ exports.createEvent = (request, response) =>
         eventDate: request.body.eventDate,
         zipcode: request.body.zipcode,
         services: request.body.services
+    }
+
+    let errors = {}
+    if(!isZipcode(newEvent.zipcode))
+        errors.zipcode = 'Invalid zipcode format'
+    if(new Date().toISOString() > newEvent.eventDate)
+        errors.eventDate = 'Event date must be some time in the future'
+
+    if(Object.keys(errors).length > 0)
+    {
+        return response.status(400).json(errors); 
     }
 
     db.collection('events')

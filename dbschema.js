@@ -19,11 +19,11 @@ let CloudFirestoreDB =
             userID: 'biEX5dBoj4eAPpTn1LCsB3iDQE13', 
             email: '808hertz@gmail.com',
             userHandle: 'matt8p',
-            fullName: 'Matthew Wang',
+            fullName: '808Hertz Entertainment',
             type: 'service',                                                //Either a client or service account 
             createdAt: '2020-11-28T22:06:14.024Z', 
             imageUrl: 'image/whatever/whatever',
-            bio: '808Hertz is the best entertainment service',                                  //Arraylist of events 
+            bio: 'We are 808Hertz Entertainment LLC, a professional entertainment service in the Arizona valley. Our service provides quality DJ, lighting, and event photography to turn your event into an unforgettable time of your life.',                                  //Arraylist of events 
             zipcode: '85286',
             reviews: {
                 numberOfReviews: 1, 
@@ -35,10 +35,9 @@ let CloudFirestoreDB =
                         comment: '808Hertz did a fantastic job at my anniversary'
                     }
                 ]
-            }
+            },
+            tags: ['DJ', 'Lighting', 'Photography'] 
         }
-
-
     ],
 
     events: [
@@ -75,7 +74,7 @@ let CloudFirestoreDB =
             userHandle: `${userHandle}`,
             createdAt: '2020-11-28T22:07:14',
             event: `${eventID}`,
-            approved: '', 
+            approved: false, 
             price: 500, 
             details: 'Will DJ at the event from 8Am to 9pm ',
             service: {

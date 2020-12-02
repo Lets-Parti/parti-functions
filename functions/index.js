@@ -8,7 +8,7 @@ const FirebaseAuth = require('./util/fbAuth');
 const app = express()   
 
 // events routes 
-app.post('/events/user', FirebaseAuth, getUsersEvents);
+app.get('/events/user', FirebaseAuth, getUsersEvents);
 app.post('/events/id', getEventByID);
 app.post('/events', FirebaseAuth, createEvent); 
 
