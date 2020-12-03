@@ -24,14 +24,16 @@ exports.signup = (request, response) =>
     errors = {};
     if(!isEmail(newUser.email))
         errors.email = 'Invalid email format'
-    if(isEmpty(newUser.userHandle))
+    if(newUser.userHandle === isEmpty(newUser.userHandle))
         errors.userHandle = 'User handle cannot be empty'
+    if(newUser.fullName === null || isEmpty(newUser.fullName))
+        errors.fullName = 'Full Name cannot be empty'
     if(!isZipcode(newUser.zipcode))
         errors.zipcode = 'Invalid zipcode format';
     if(newUser.type !== 'client' && newUser.type !== 'service')
         errors.type = 'Type must be type client or service';
     if(newUser.password !== newUser.confirmPassword)
-        errors.password = 'Passwords must match';
+        errors.confirmPassword = 'Passwords must match';
 
     if(Object.keys(errors).length > 0)
         return response.status(400).json(errors);
@@ -42,7 +44,7 @@ exports.signup = (request, response) =>
     db.doc(dbPath).get()
     .then(doc => {
         if(doc.exists){                                                                                 //Check if the username exists             
-            return response.status(400).json({handle: `Handle ${newUser.userHandle} already exists`});
+            return response.status(400).json({userHandle: `Handle ${newUser.userHandle} already exists`});
         } else {
             return firebase.auth().createUserWithEmailAndPassword(newUser.email, newUser.password);      //Create new user 
         }
@@ -85,6 +87,9 @@ exports.signup = (request, response) =>
         console.error(error) 
         if(error.code === 'auth/email-already-in-use'){
             return response.status(400).json({email: `Email ${newUser.email} is already in use`})
+        }else if(error.code === 'auth/weak-password')
+        {
+            return response.status(400).json({password: `Password too weak`})
         }else {
             return response.status(500).json({error: error.code})
         }

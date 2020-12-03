@@ -95,6 +95,19 @@ exports.createEvent = (request, response) =>
         errors.zipcode = 'Invalid zipcode format'
     if(new Date().toISOString() > newEvent.eventDate)
         errors.eventDate = 'Event date must be some time in the future'
+    if(isEmpty(newEvent.title))
+        errors.title = 'Event name cannot be empty'
+    if(newEvent.services.length === 0)
+        errors.serviceType = 'Must submit one or more services'
+
+    newEvent.services.forEach(service =>
+    {
+        if(!service.serviceType || service.serviceType === null || isEmpty(service.serviceType))
+        {
+            errors.serviceType = 'One or more services missing'
+        }
+    })
+    
 
     if(Object.keys(errors).length > 0)
     {
