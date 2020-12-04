@@ -1,7 +1,7 @@
 const {admin, db} = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
-const {isEmail, isEmpty, isZipcode} = require('../util/validators');
+const {isEmail, isEmpty, isZipcode, containsSpecialCharacters} = require('../util/validators');
 const { user } = require('firebase-functions/lib/providers/auth');
 
 firebase.initializeApp(config); 
@@ -24,8 +24,10 @@ exports.signup = (request, response) =>
     errors = {};
     if(!isEmail(newUser.email))
         errors.email = 'Invalid email format'
-    if(newUser.userHandle === isEmpty(newUser.userHandle))
-        errors.userHandle = 'User handle cannot be empty'
+    if(newUser.userHandle === null || isEmpty(newUser.userHandle))
+        errors.userHandle = 'Username cannot be empty'
+    if(containsSpecialCharacters(newUser.userHandle))
+        errors.userHandle = 'Username must not contain special characters'
     if(newUser.fullName === null || isEmpty(newUser.fullName))
         errors.fullName = 'Full Name cannot be empty'
     if(!isZipcode(newUser.zipcode))
@@ -77,7 +79,6 @@ exports.signup = (request, response) =>
                 reviews: []
             }
         }
-
         return db.doc(dbPath).set(userInfoToDatabase)
     })
     .then(() => {
@@ -99,34 +100,80 @@ exports.signup = (request, response) =>
 exports.login = (request, response) =>
 {
     const user = {
-        email: request.body.email, 
+        emailOrHandle: request.body.emailOrHandle, 
         password: request.body.password
     };
 
     let errors = {}
-    if(isEmpty(user.email)) errors.email = 'Email must not be empty'; 
+
+    if(isEmpty(user.emailOrHandle)) errors.emailOrHandle = 'Form must not be empty'; 
     if(isEmpty(user.password)) errors.password = 'Password must not be empty';
 
     if(Object.keys(errors).length > 0) return response.status(400).json(errors); 
-
-    firebase.auth()
-    .signInWithEmailAndPassword(user.email, user.password)
-    .then(data =>
+    
+    if(!isEmail(user.emailOrHandle))                                            //Handle authentication if it is a handle
     {
-        return data.user.getIdToken(); 
-    })
-    .then(token => 
+        const dbPath = `/users/${user.emailOrHandle}`
+        db.doc(dbPath).get()
+        .then(doc => 
+        {
+            if(!doc.exists)
+            {
+                return response.status(500).json({emailOrHandle: 'Username not found'})
+            }else                                                               
+            {
+                firebase.auth()
+                .signInWithEmailAndPassword(doc.data().email, user.password)
+                .then(data =>
+                {
+                    return data.user.getIdToken(); 
+                })
+                .then(token => 
+                {
+                    return response.status(201).json({token})
+                })
+                .catch(err =>
+                {
+                    if(err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password')
+                    {
+                        response.status(500).json({auth: 'Invalid credentials. Please try again'});
+                    }else
+                    {
+                        response.status(500).json({error: err.code})
+                    }
+                });
+            }
+        })
+        .catch(err =>
+        {
+            response.status(500).json({error: err.code})
+        })
+    }else                                                                       //Handle authentication if it is email 
     {
-        return response.status(201).json({token})
-    })
-    .catch(err =>
-    {
-        console.error(err); 
-        response.status(500).json({error: err.code});
-    });
+        firebase.auth()
+        .signInWithEmailAndPassword(user.emailOrHandle, user.password)
+        .then(data =>
+        {
+            return data.user.getIdToken(); 
+        })
+        .then(token => 
+        {
+            return response.status(201).json({token})
+        })
+        .catch(err =>
+        {
+            if(err.code === 'auth/user-not-found')
+            {
+                response.status(500).json({auth: 'Invalid credentials. Please try again'});
+            }else
+            {
+                response.status(500).json({error: err.code})
+            }
+        });
+    }
 }
 
-exports.getUser = (request, response) =>
+exports.getUserByHandle = (request, response) =>
 {
     const userHandle = request.body.userHandle; 
     if(userHandle.length == 0)
@@ -154,6 +201,33 @@ exports.getUser = (request, response) =>
     })
 }
 
+exports.getAuthenticatedUser = (request, response) =>
+{
+    const userHandle = request.user.userHandle; 
+    if(userHandle.length == 0)
+    {
+        return response.status(500).json({error: 'User handle cannot be empty'});
+    }
+
+    const dbPath = `/users/${userHandle}`;
+
+    db.doc(dbPath).get()
+    .then(doc =>
+    {
+        if(!doc.exists)
+        {
+            return response.status(500).json({error: `userHandle ${userHandle} does not exist`})
+        }else
+        {
+            return response.status(201).json({ user: doc.data() });
+        }
+    })
+    .catch(err => 
+    {
+        console.log(err); 
+        return response.status(500).json({error: err.code});
+    })
+}
 
 exports.uploadProfileImage = (request, response) =>
 {
