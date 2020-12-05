@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-const express = require('express')
+const express = require('express'); 
 
 const { getAllEvents, createEvent, getEventByID, getUsersEvents } = require('./handlers/events');
 const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser} = require('./handlers/users');
@@ -7,8 +7,10 @@ const FirebaseAuth = require('./util/fbAuth');
 
 const app = express()   
 
+const cors = require('cors')
+app.use(cors()); 
 // events routes 
-app.get('/events/user', FirebaseAuth, getUsersEvents);
+app.get('/events', FirebaseAuth, getUsersEvents);
 app.post('/events/id', getEventByID);
 app.post('/events', FirebaseAuth, createEvent); 
 

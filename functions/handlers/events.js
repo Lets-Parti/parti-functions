@@ -32,6 +32,14 @@ exports.getUsersEvents = (request, response) =>
                     thisDocumentData.eventID = doc.id; 
                     events.push(thisDocumentData); 
                 })
+
+                events.sort((x, y) =>                                                                           //Sort the events by created date from newest to oldest 
+                {
+                    if(x.createdAt < y.createdAt) return 1; 
+                    if(x.createdAt > y.createdAt) return -1; 
+                    return 0; 
+                })
+
                 return response.json(events); 
             })
             .catch(err =>
