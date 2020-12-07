@@ -1,6 +1,6 @@
 exports.isEmpty = (string) =>                                           //Check if string is empty
 {   
-    return string.length == 0; 
+    return string.length === 0; 
 }
 
 exports.isZipcode = (zipcode) =>

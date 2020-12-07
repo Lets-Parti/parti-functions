@@ -16,6 +16,7 @@ exports.signup = (request, response) =>
         email: request.body.email, 
         password: request.body.password, 
         confirmPassword: request.body.confirmPassword,
+        bio: request.body.bio, 
         type: request.body.type, 
         zipcode: request.body.zipcode
     };
@@ -70,7 +71,7 @@ exports.signup = (request, response) =>
             imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`
         }
 
-        if(newUser.type === 'service')
+        if(newUser.type === 'service')                              //Add extra information for service account types 
         {
             userInfoToDatabase.reviews = 
             {
@@ -78,6 +79,7 @@ exports.signup = (request, response) =>
                 averageStars: 0, 
                 reviews: []
             }
+            userInfoToDatabase.bio = newUser.bio
         }
         return db.doc(dbPath).set(userInfoToDatabase)
     })
