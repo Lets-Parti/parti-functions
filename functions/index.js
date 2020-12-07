@@ -22,5 +22,8 @@ app.post('/user/image', FirebaseAuth, uploadProfileImage);
 app.post('/user/handle', getUserByHandle);
 app.get('/user', FirebaseAuth, getAuthenticatedUser); 
 
+// discover routes
+app.get('/discover', getNearbyServices);
+
 exports.api = functions.https.onRequest(app)
 

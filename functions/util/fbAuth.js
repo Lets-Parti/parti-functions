@@ -23,6 +23,7 @@ module.exports = (request, response, next) =>
     {
         request.user.userHandle = data.docs[0].data().userHandle; 
         request.user.type = data.docs[0].data().type; 
+        request.user.zipcode = data.docs[0].data().zipcode; 
         return next(); 
     })
     .catch(err =>

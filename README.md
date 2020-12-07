@@ -18,6 +18,8 @@ To visualize the structure of the database, check out the file `dbschema.js`
 
 POST request full example:
 
+For 'client' type accounts
+
 ```
 {
     "userHandle": "matt8p",
@@ -26,6 +28,21 @@ POST request full example:
     "password": "pass123",
     "confirmPassword": "pass123",
     "type": "client",
+    "zipcode": "85286"
+}
+```
+
+For 'service' type accounts
+
+```
+{
+    "userHandle": "808hz",
+    "fullName": "808Hertz Entertainment",
+    "email": "808hertz@gmail.com",
+    "password": "pass123",
+    "confirmPassword": "pass123",
+    "bio": "We are the best entertainment company in the valley",
+    "type": "service",
     "zipcode": "85286"
 }
 ```
@@ -232,6 +249,40 @@ The response will be the details of each event id:
             }
         ],
         "eventDate": "2021-01-12T00:00:00"
+    }
+]
+```
+
+## GET: `/discover`
+
+To retrieve a list of services nearby, use the `/discover` API
+This GET request requires a header with key `service`. It will then return a list of services that contain the header service value in the account tag.
+
+Example: service: "DJ"
+
+```
+[
+    {
+        "fullName": "808Hertz Entertainment",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/no_img.png?alt=media",
+        "email": "808hertz@gmail.com",
+        "userID": "eJl8n5Rjczbc7DBnvbLzmGu2CZd2",
+        "type": "service",
+        "userHandle": "808hz",
+        "tags": [
+        "DJ",
+        "Lighting",
+        "Photography"
+        ],
+        "bio": "We are the best entertainment company in the valley",
+        "events": [],
+        "zipcode": "85286",
+        "createdAt": "2020-12-07T00:29:05.790Z",
+        "reviews": {
+        "reviews": [],
+        "averageStars": 0,
+        "numberOfReviews": 0
+        }
     }
 ]
 ```

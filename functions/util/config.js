@@ -6,5 +6,5 @@ module.exports = {
     storageBucket: "lets-parti.appspot.com",
     messagingSenderId: "922483274193",
     appId: "1:922483274193:web:7576441a675d50bb8470f0",
-    measurementId: "G-17JK2V8HFB"
+    measurementId: "G-17JK2V8HFB", 
   };
