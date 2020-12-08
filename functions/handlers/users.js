@@ -239,6 +239,7 @@ exports.getAuthenticatedUser = (request, response) =>
 
 exports.uploadProfileImage = (request, response) =>
 {
+    const userHandle = request.user.userHandle; 
     console.log('Upload Image'); 
 
     const busboy = new BusBoy({ headers: request.headers});
@@ -252,7 +253,7 @@ exports.uploadProfileImage = (request, response) =>
             return response.status(400).json({ error: 'Wrong file type submitted'});
 
         const imageExtention = filename.split('.')[filename.split('.').length - 1];     //Get the file type (.png, .jpt, ext)
-        imageFileName = `${Math.round(Math.random() * 10000000)}.${imageExtention}`; 
+        imageFileName = `${userHandle}-profileImage.${imageExtention}`; 
         const filepath = path.join(os.tmpdir(), imageFileName);
         imageToBeUploaded = { filepath, mimetype }; 
         file.pipe(fs.createWriteStream(filepath)); 
@@ -276,7 +277,10 @@ exports.uploadProfileImage = (request, response) =>
         })
         .then( () => 
         {
-            return response.json({ message: 'Image uploaded successfully' , url: `${imageUrl}`});
+            return response.json({ 
+                message: 'Image uploaded successfully' , 
+                url: `${imageUrl}`
+            });
         })
         .catch(err =>
         {
