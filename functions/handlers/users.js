@@ -4,6 +4,12 @@ const config = require('../util/config');
 const {isEmail, isEmpty, isZipcode, containsSpecialCharacters} = require('../util/validators');
 const { user } = require('firebase-functions/lib/providers/auth');
 
+//Image upload modules
+const BusBoy = require('busboy');
+const path = require('path'); 
+const os = require('os'); 
+const fs = require('fs'); 
+
 firebase.initializeApp(config); 
 
 exports.signup = (request, response) =>
@@ -234,10 +240,6 @@ exports.getAuthenticatedUser = (request, response) =>
 exports.uploadProfileImage = (request, response) =>
 {
     console.log('Upload Image'); 
-    const BusBoy = require('busboy');
-    const path = require('path'); 
-    const os = require('os'); 
-    const fs = require('fs'); 
 
     const busboy = new BusBoy({ headers: request.headers});
 
