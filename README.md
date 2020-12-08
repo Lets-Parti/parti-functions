@@ -64,7 +64,7 @@ POST request full example:
 
 ```
 {
-    "email": "matt8p@gmail.com",
+    "emailOrHandle": "matt8p@gmail.com",
     "password": "pass123"
 }
 ```

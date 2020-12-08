@@ -2,7 +2,7 @@ const {admin, db} = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
 const {isEmail, isEmpty, isZipcode, containsSpecialCharacters} = require('../util/validators');
-const { user } = require('firebase-functions/lib/providers/auth');
+const { user, service } = require('firebase-functions/lib/providers/auth');
 
 //Image upload modules
 const BusBoy = require('busboy');
@@ -16,6 +16,7 @@ exports.signup = (request, response) =>
 {
     let token;
     let userUID;
+    
     const newUser = {
         userHandle: request.body.userHandle, 
         fullName: request.body.fullName, 
@@ -24,7 +25,8 @@ exports.signup = (request, response) =>
         confirmPassword: request.body.confirmPassword,
         bio: request.body.bio, 
         type: request.body.type, 
-        zipcode: request.body.zipcode
+        zipcode: request.body.zipcode,
+        service: request.body.service
     };
 
     console.log(newUser); 
@@ -43,6 +45,8 @@ exports.signup = (request, response) =>
         errors.type = 'Type must be type client or service';
     if(newUser.password !== newUser.confirmPassword)
         errors.confirmPassword = 'Passwords must match';
+    if(newUser.type === 'service' && isEmpty(newUser.service))
+        errors.service = 'Service type cannot be left empty'
 
     if(Object.keys(errors).length > 0)
         return response.status(400).json(errors);
@@ -86,6 +90,8 @@ exports.signup = (request, response) =>
                 reviews: []
             }
             userInfoToDatabase.bio = newUser.bio
+            userInfoToDatabase.service = newUser.service
+            userInfoToDatabase.tags = []
         }
         return db.doc(dbPath).set(userInfoToDatabase)
     })
