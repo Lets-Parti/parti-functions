@@ -45,7 +45,7 @@ exports.signup = (request, response) =>
         errors.type = 'Type must be type client or service';
     if(newUser.password !== newUser.confirmPassword)
         errors.confirmPassword = 'Passwords must match';
-    if(newUser.type === 'service' && isEmpty(newUser.service))
+    if(newUser.type === 'service' && (!newUser.service || isEmpty(newUser.service)))
         errors.service = 'Service type cannot be left empty'
 
     if(Object.keys(errors).length > 0)
