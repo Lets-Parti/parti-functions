@@ -291,3 +291,43 @@ Example: service: "DJ"
     }
 ]
 ```
+
+## GET: `/feedback`
+
+To send feedback about your experience using the Parti app, use the `/feedback` API
+
+The API takes as input a required text field, an optional phone number and option email. The phone number is put into the form xxx-xxx-xxxx as long as the input has 10 digits. 
+The API also accounts for users trying to manually separate the area code and certain digits with parenthesis and hyphens.
+
+Example: 
+
+```
+[
+    {
+        "info": "I really enjoy using Parti",
+        "emailOrHandle": "test123@gmail.com",
+        "phone": "8493494834"
+    }
+]
+
+```
+
+Response:
+
+```
+{
+    "message": "Feedback NVuPlCH9UG0Sv35HuruN created"
+}
+
+```
+
+Database:
+```
+[
+    {
+        "info": "I really enjoy using Parti",
+        "emailOrHandle": "test123@gmail.com",
+        "phone": "849-349-4834"
+    }
+]
+```
