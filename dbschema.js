@@ -36,7 +36,7 @@ let CloudFirestoreDB =
                     }
                 ]
             },
-            service: 'DJ',
+            service: 'DJ',                                              
             mediaImages: ['image/whatever/whatever'],
             tags: ['DJ', 'Lighting', 'Photography'] 
         }
