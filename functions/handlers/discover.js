@@ -11,7 +11,7 @@ exports.getNearbyServices = (request, response) =>
     if(service.length > 0)
     {
         db.collection('users')
-        .where('tags', 'array-contains', service)
+        .where('service', '==', service)
         .get()
         .then(data =>
         {
