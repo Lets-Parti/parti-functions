@@ -91,7 +91,7 @@ exports.signup = (request, response) =>
             }
             userInfoToDatabase.bio = newUser.bio
             userInfoToDatabase.service = newUser.service
-            userInfoToDatabase.tags = []
+            userInfoToDatabase.tags = [newUser.service]
             userInfoToDatabase.mediaImages = []
         }
         return db.doc(dbPath).set(userInfoToDatabase)
