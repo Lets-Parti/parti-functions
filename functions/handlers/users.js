@@ -2,7 +2,13 @@ const {admin, db} = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
 const {isEmail, isEmpty, isZipcode, containsSpecialCharacters} = require('../util/validators');
-const { user } = require('firebase-functions/lib/providers/auth');
+const { user, service } = require('firebase-functions/lib/providers/auth');
+
+//Image upload modules
+const BusBoy = require('busboy');
+const path = require('path'); 
+const os = require('os'); 
+const fs = require('fs'); 
 
 firebase.initializeApp(config); 
 
@@ -10,6 +16,7 @@ exports.signup = (request, response) =>
 {
     let token;
     let userUID;
+    
     const newUser = {
         userHandle: request.body.userHandle, 
         fullName: request.body.fullName, 
@@ -18,7 +25,8 @@ exports.signup = (request, response) =>
         confirmPassword: request.body.confirmPassword,
         bio: request.body.bio, 
         type: request.body.type, 
-        zipcode: request.body.zipcode
+        zipcode: request.body.zipcode,
+        service: request.body.service
     };
 
     console.log(newUser); 
@@ -37,6 +45,8 @@ exports.signup = (request, response) =>
         errors.type = 'Type must be type client or service';
     if(newUser.password !== newUser.confirmPassword)
         errors.confirmPassword = 'Passwords must match';
+    if(newUser.type === 'service' && (!newUser.service || isEmpty(newUser.service)))
+        errors.service = 'Service type cannot be left empty'
 
     if(Object.keys(errors).length > 0)
         return response.status(400).json(errors);
@@ -80,6 +90,9 @@ exports.signup = (request, response) =>
                 reviews: []
             }
             userInfoToDatabase.bio = newUser.bio
+            userInfoToDatabase.service = newUser.service
+            userInfoToDatabase.tags = [newUser.service]
+            userInfoToDatabase.mediaImages = []
         }
         return db.doc(dbPath).set(userInfoToDatabase)
     })
@@ -233,11 +246,8 @@ exports.getAuthenticatedUser = (request, response) =>
 
 exports.uploadProfileImage = (request, response) =>
 {
+    const userHandle = request.user.userHandle; 
     console.log('Upload Image'); 
-    const BusBoy = require('busboy');
-    const path = require('path'); 
-    const os = require('os'); 
-    const fs = require('fs'); 
 
     const busboy = new BusBoy({ headers: request.headers});
 
@@ -250,7 +260,7 @@ exports.uploadProfileImage = (request, response) =>
             return response.status(400).json({ error: 'Wrong file type submitted'});
 
         const imageExtention = filename.split('.')[filename.split('.').length - 1];     //Get the file type (.png, .jpt, ext)
-        imageFileName = `${Math.round(Math.random() * 10000000)}.${imageExtention}`; 
+        imageFileName = `${userHandle}-profileImage.${imageExtention}`; 
         const filepath = path.join(os.tmpdir(), imageFileName);
         imageToBeUploaded = { filepath, mimetype }; 
         file.pipe(fs.createWriteStream(filepath)); 
@@ -274,12 +284,68 @@ exports.uploadProfileImage = (request, response) =>
         })
         .then( () => 
         {
-            return response.json({ message: 'Image uploaded successfully' , url: `${imageUrl}`});
+            return response.json({ 
+                message: 'Image uploaded successfully' , 
+                url: `${imageUrl}`
+            });
         })
         .catch(err =>
         {
             console.error(err); 
             return response.status(500).json({ error: err.code});
+        })
+    })
+    busboy.end(request.rawBody); 
+}
+
+exports.uploadMediaImages = (request, response) =>
+{
+    const userHandle = request.user.userHandle; 
+    const type = request.user.type; 
+
+    if(type !== 'service')
+        return response.status(500).json({type: 'User type must be of type service'});
+
+        const busboy = new BusBoy({ headers: request.headers});
+
+    let imageFileName;
+    let imageToBeUploaded = {}; 
+
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) =>
+    {
+        if(mimetype !== 'image/jpeg' && mimetype !== 'image/png')
+            return response.status(400).json({ error: 'Wrong file type submitted'});
+
+        const imageExtention = filename.split('.')[filename.split('.').length - 1];     //Get the file type (.png, .jpt, ext)
+        const randomGeneratedNumber = Math.floor(Math.random() * Math.floor(10000000));
+        imageFileName = `${userHandle}-${randomGeneratedNumber}-mediaImage.${imageExtention}`; 
+        const filepath = path.join(os.tmpdir(), imageFileName);
+        imageToBeUploaded = { filepath, mimetype }; 
+        file.pipe(fs.createWriteStream(filepath)); 
+    });
+
+    let imageUrl;
+    busboy.on('finish', () =>
+    {
+        admin.storage().bucket().upload(imageToBeUploaded.filepath, {
+            resumable: false, 
+            metadata: {
+                metadata: {
+                    contentType: imageToBeUploaded.mimetype
+                }
+            }
+        })
+        .then(() => 
+        {
+            imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
+            response.status(201).json({
+                message: 'Image ploaded successfully', 
+                url: `${imageUrl}`
+            });
+        })
+        .catch(err =>
+        {
+            response.status(500).json({error: `${err.code}`});
         })
     })
     busboy.end(request.rawBody); 
