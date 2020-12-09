@@ -18,7 +18,7 @@ app.post('/events', FirebaseAuth, createEvent);
 // user routes 
 app.post('/signup', signup);
 app.post('/login', login);
-app.get('/user/handle', getUserByHandle);
+app.get('/user/:userhandle', getUserByHandle);
 app.get('/user', FirebaseAuth, getAuthenticatedUser);
 
 app.post('/user/image', FirebaseAuth, uploadProfileImage);

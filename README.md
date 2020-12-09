@@ -83,9 +83,9 @@ If successful, the response will return the user's bearer token.
 
 \*Retrieve user info of the current authenticated user\*\*. User must be logged in to call the request. The request will return profile data in JSON format
 
-## GET: `/user/handle`
+## GET: `/user/:handle`
 
-**Retrieve user info of a given handle**. The GET request must have a header `userhandle`. It will only return profile data for user type `service`
+**Retrieve user info of a given handle**. The GET request must have a param userhandle. For example, call the endponit `user/808hertz` to retrieve data for account 808hertz
 
 If successfull the response will return the user's basic information
 
