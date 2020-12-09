@@ -91,7 +91,7 @@ exports.signup = (request, response) =>
             }
             userInfoToDatabase.bio = newUser.bio
             userInfoToDatabase.service = newUser.service
-            userInfoToDatabase.tags = [newUser.service]
+            userInfoToDatabase.tags = [newUser.service]             
             userInfoToDatabase.mediaImages = []
         }
         return db.doc(dbPath).set(userInfoToDatabase)
@@ -190,7 +190,8 @@ exports.login = (request, response) =>
 
 exports.getUserByHandle = (request, response) =>
 {
-    const userHandle = request.body.userHandle; 
+    const userHandle = request.headers.userhandle; 
+    
     if(userHandle.length == 0)
     {
         return response.status(500).json({error: 'User handle cannot be empty'});
@@ -206,7 +207,14 @@ exports.getUserByHandle = (request, response) =>
             return response.status(500).json({error: `userHandle ${userHandle} does not exist`})
         }else
         {
-            return response.status(201).json({ user: doc.data() });
+            let userData = doc.data(); 
+            if(userData.type === 'service')
+            {
+                return response.status(201).json({user: doc.data()});
+            }else
+            {
+                return response.status(201).json({message: 'Cannot retrieve client type users'});
+            }
         }
     })
     .catch(err => 

@@ -79,34 +79,39 @@ If successful, the response will return the user's bearer token.
 }
 ```
 
-## POST: `/user`
+## GET: `/user`
 
-**Retrieve user info of a given handle**. The POST request body must contain the following parameters:
+\*Retrieve user info of the current authenticated user\*\*. User must be logged in to call the request. The request will return profile data in JSON format
 
-`[userHandle]`
+## GET: `/user/handle`
 
-POST request full example:
-
-```
-{
-    "userHandle": "matt8p"
-}
-```
+**Retrieve user info of a given handle**. The GET request must have a header `userhandle`. It will only return profile data for user type `service`
 
 If successfull the response will return the user's basic information
 
 ```
 {
     "user": {
-        "fullName": "Matthew Wang",
-        "events": [],
-        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/9242079.JPG?alt=media",
-        "type": "client",
+        "email": "808hertz@gmail.com",
+        "reviews": {
+            "reviews": [],
+            "averageStars": 0,
+            "numberOfReviews": 0
+        },
+        "fullName": "808Hertz Entertainment",
+        "userID": "hH72cr8FK0d48efuxdP3Gm8v3Y72",
+        "type": "service",
+        "mediaImages": [],
+        "bio": "808Hertz is the best entertainment company in the valley. We provide services such as DJing and Photography ",
+        "service": "Photography",
         "zipcode": "85286",
-        "createdAt": "2020-11-30T22:18:17.526Z",
-        "email": "matt8p@gmail.com",
-        "userHandle": "matt8p",
-        "userID": "eTD9baSx9CMehSapCTjaaw5DJDI3"
+        "tags": [
+            "DJ"
+        ],
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/no_img.png?alt=media",
+        "events": [],
+        "userHandle": "808hertz",
+        "createdAt": "2020-12-09T18:50:12.956Z"
     }
 }
 ```
