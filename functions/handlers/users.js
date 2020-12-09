@@ -190,7 +190,7 @@ exports.login = (request, response) =>
 
 exports.getUserByHandle = (request, response) =>
 {
-    const userHandle = request.headers.userhandle; 
+    const userHandle = request.params.userhandle; 
     
     if(userHandle.length == 0)
     {
