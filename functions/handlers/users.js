@@ -210,7 +210,7 @@ exports.getUserByHandle = (request, response) =>
             let userData = doc.data(); 
             if(userData.type === 'service')
             {
-                return response.status(201).json(doc.data());
+                return response.status(201).json({user: doc.data()});
             }else
             {
                 return response.status(201).json({message: 'Cannot retrieve client type users'});
