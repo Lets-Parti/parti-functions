@@ -315,7 +315,7 @@ exports.uploadMediaImages = (request, response) =>
     if(type !== 'service')
         return response.status(500).json({type: 'User type must be of type service'});
 
-        const busboy = new BusBoy({ headers: request.headers});
+    const busboy = new BusBoy({ headers: request.headers});
 
     let imageFileName;
     let imageToBeUploaded = {}; 
@@ -347,10 +347,29 @@ exports.uploadMediaImages = (request, response) =>
         .then(() => 
         {
             imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
-            response.status(201).json({
-                message: 'Image ploaded successfully', 
-                url: `${imageUrl}`
-            });
+            const dbPath = `/users/${userHandle}`;
+            db.doc(dbPath).get()
+            .then(doc =>
+            {
+                let mediaImages = doc.data().mediaImages; 
+                mediaImages.push(imageUrl); 
+                db.doc(dbPath).update({mediaImages})
+                .then(res =>
+                {
+                    response.status(201).json({
+                        message: 'Image ploaded successfully', 
+                        url: `${imageUrl}`
+                    });
+                })
+                .catch(err =>
+                {
+                    response.status(500).json({error: err.code});
+                })
+            })
+            .catch(err =>
+            {
+                response.status(500).json({error: err.code});
+            })
         })
         .catch(err =>
         {

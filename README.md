@@ -120,7 +120,7 @@ If successfull the response will return the user's basic information
 
 **Upload a jpg or png file as user's profile image**. POST request body must contain authentication through Bearer token.
 
-**Upload the photo through url encoded**
+**Upload the photo through url encoded**. It will then set the imageUrl as the url
 
 If successful, the response will return:
 
@@ -130,6 +130,12 @@ If successful, the response will return:
     "url": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/9242079.JPG?alt=media"
 }
 ```
+
+## POST: `/user/services/media`
+
+**Upload a jpg or png to the profile's media**. POST request must contain Bearer token of a service account. **Upload the photo through url encoded**. This will add the photo to storage, then add the photo url to the mediaImages array in the service account
+
+If successful, the response will return:
 
 # `Events` Route API's
 
