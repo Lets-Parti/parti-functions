@@ -25,7 +25,7 @@ app.post('/login', login);
 app.get('/user/:userhandle', getUserByHandle);
 app.get('/user', FirebaseAuth, getAuthenticatedUser);
 //TODO: Matt & Aaric
-app.post('/user', FirebaseAuth, updateUserProfile)
+app.post('/account/edit', FirebaseAuth, updateUserProfile)
 
 app.post('/user/image', FirebaseAuth, uploadProfileImage);
 app.post('/user/services/media', FirebaseAuth, uploadMediaImages);

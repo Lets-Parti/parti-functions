@@ -381,6 +381,77 @@ exports.uploadMediaImages = (request, response) =>
 
 exports.updateUserProfile = (request, response) =>
 {
-    const type = request.user.type
-    return response.json({type})
+    const type = request.user.type;
+    const userHandle = request.user.userHandle; 
+    const dbPath = `/users/${userHandle}`;
+    
+    let errors = {}; 
+
+    let newData = {
+        zipcode: request.body.zipcode, 
+        fullName: request.body.fullName,
+        userHandle
+    }
+
+    console.log(newData.fullName)
+    if(!newData.zipcode)
+        errors.zipcode = 'Must include a zipcode object in the request';
+    if(!newData.fullName)
+        errors.fullName = 'Must include a Full Name object in the request'; 
+    if(newData.fullName && isEmpty(newData.fullName))
+        errors.fullName = 'Name cannot be empty';
+    if(newData.zipcode && !isZipcode(newData.zipcode))
+        errors.zipcode = 'Invalid zipcode format';
+
+    if(Object.keys(errors).length > 0)
+    {
+        return response.status(500).json(errors); 
+    }
+
+    if(type === 'client')
+    {   
+        console.log(`Updating client account: ${userHandle}`);
+        db.doc(dbPath).update(newData)
+        .then(() =>
+        {
+            return response.status(201).json({message: `User ${userHandle} updated with new information`});
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({error: `Could not update information for user ${userHandle}`})
+        })
+    }else if(type === 'service') 
+    {
+        newData.tags = request.body.tags;
+        newData.mediaImages =request.body.mediaImages;
+        newData.bio = request.body.bio;
+        
+        if(!newData.tags)
+            errors.tags = 'Must contain tag object in request';
+        if(!newData.mediaImages)
+            errors.mediaImages = 'Must contain mediaImages object in request';      
+        if(!newData.bio)
+            errors.bio = 'Must contain bio object in request';
+
+        if(newData.tags && !Array.isArray(newData.tags))
+            errors.tags = 'tag object must be of type Array';
+        if(newData.mediaImages && !Array.isArray(newData.mediaImages))
+            errors.mediaImages = 'mediaImages object must be of type Array';
+
+        if(Object.keys(errors).length > 0)
+        {
+            return response.status(500).json(errors); 
+        }
+
+        console.log(`Updating service account: ${userHandle}`);
+        db.doc(dbPath).update(newData)
+        .then(() =>
+        {
+            return response.status(201).json({message: `Service ${userHandle} updated with new information`});
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({error: `Could not update information for service ${userHandle}`});
+        })
+    }
 }

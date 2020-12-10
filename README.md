@@ -144,6 +144,39 @@ If successful, the response will return:
 }
 ```
 
+## POST: `/account/edit`
+
+**Update the user profile of the current user logged in**. POST request must contain a Bearer token of an account or service.
+
+Sample body for client:
+
+```
+{
+    "zipcode": "00001",
+    "fullName": "Cool Entertainment LLC"
+}
+```
+
+Sample body for service:
+
+```
+{
+    "zipcode": "00001",
+    "fullName": "Cool Entertainment LLC",
+    "tags": ["DJ", "Photography"],
+    "mediaImages": [],
+    "bio": "Best company"
+}
+```
+
+Sample response:
+
+```
+{
+    "message": "(User/Service) 808hertz updated with new information"
+}
+```
+
 # `Events` Route API's
 
 ## POST: `/events`
