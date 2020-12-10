@@ -79,34 +79,39 @@ If successful, the response will return the user's bearer token.
 }
 ```
 
-## POST: `/user`
+## GET: `/user`
 
-**Retrieve user info of a given handle**. The POST request body must contain the following parameters:
+\*Retrieve user info of the current authenticated user\*\*. User must be logged in to call the request. The request will return profile data in JSON format
 
-`[userHandle]`
+## GET: `/user/:handle`
 
-POST request full example:
-
-```
-{
-    "userHandle": "matt8p"
-}
-```
+**Retrieve user info of a given handle**. The GET request must have a param userhandle. For example, call the endponit `user/808hertz` to retrieve data for account 808hertz
 
 If successfull the response will return the user's basic information
 
 ```
 {
     "user": {
-        "fullName": "Matthew Wang",
-        "events": [],
-        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/9242079.JPG?alt=media",
-        "type": "client",
+        "email": "808hertz@gmail.com",
+        "reviews": {
+            "reviews": [],
+            "averageStars": 0,
+            "numberOfReviews": 0
+        },
+        "fullName": "808Hertz Entertainment",
+        "userID": "hH72cr8FK0d48efuxdP3Gm8v3Y72",
+        "type": "service",
+        "mediaImages": [],
+        "bio": "808Hertz is the best entertainment company in the valley. We provide services such as DJing and Photography ",
+        "service": "Photography",
         "zipcode": "85286",
-        "createdAt": "2020-11-30T22:18:17.526Z",
-        "email": "matt8p@gmail.com",
-        "userHandle": "matt8p",
-        "userID": "eTD9baSx9CMehSapCTjaaw5DJDI3"
+        "tags": [
+            "DJ"
+        ],
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/no_img.png?alt=media",
+        "events": [],
+        "userHandle": "808hertz",
+        "createdAt": "2020-12-09T18:50:12.956Z"
     }
 }
 ```
@@ -115,7 +120,7 @@ If successfull the response will return the user's basic information
 
 **Upload a jpg or png file as user's profile image**. POST request body must contain authentication through Bearer token.
 
-**Upload the photo through url encoded**
+**Upload the photo through url encoded**. It will then set the imageUrl as the url
 
 If successful, the response will return:
 
@@ -123,6 +128,19 @@ If successful, the response will return:
 {
     "message": "Image uploaded successfully",
     "url": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/9242079.JPG?alt=media"
+}
+```
+
+## POST: `/user/services/media`
+
+**Upload a jpg or png to the profile's media**. POST request must contain Bearer token of a service account. **Upload the photo through url encoded**. This will add the photo to storage, then add the photo url to the mediaImages array in the service account
+
+If successful, the response will return:
+
+```
+{
+    "message": "Image ploaded successfully",
+    "url": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-1201376-mediaImage.png?alt=media"
 }
 ```
 
@@ -159,7 +177,7 @@ Example Response:
 }
 ```
 
-## POST: `/events/user`
+## GET: `/events`
 
 **Get the list of events of a given user**. A Bearer token is required to specify who the user is.
 
@@ -202,57 +220,6 @@ Return structure:
 ]
 ```
 
-## POST: `/events/id`
-
-**Get a list of events by eventID**. No authorization needed.
-
-To retrieve a list of events by ID, pass an **array** of ids. Example body:
-
-```
-{
-	"ids": ["DCkKbWVxGDbO8sVCpfuZ", "nIljOG40icYuGvq4ZSA5"]
-}
-```
-
-The response will be the details of each event id:
-
-```
-[
-    {
-        "zipcode": "85286",
-        "title": "Mom's Anniversary",
-        "eventDate": "2021-01-12T00:00:00",
-        "services": [
-            {
-                "vendorFound": false,
-                "serviceType": "Photographer",
-                "description": "I need a cool photographer",
-                "service": {}
-            }
-        ],
-        "userHandle": "matt8p",
-        "description": "Mom's 20th!",
-        "createdAt": "2020-11-30T22:49:32.565Z"
-    },
-    {
-        "createdAt": "2020-11-30T22:46:59.721Z",
-        "userHandle": "matt8p",
-        "description": "Matt's 20th Birthday",
-        "zipcode": "85286",
-        "title": "Matt's Birthday",
-        "services": [
-            {
-                "vendorFound": false,
-                "service": {},
-                "serviceType": "DJ",
-                "description": "I need a DJ for my party"
-            }
-        ],
-        "eventDate": "2021-01-12T00:00:00"
-    }
-]
-```
-
 ## GET: `/discover`
 
 To retrieve a list of services nearby, use the `/discover` API
@@ -283,6 +250,47 @@ Example: service: "DJ"
         "averageStars": 0,
         "numberOfReviews": 0
         }
+    }
+]
+```
+
+## GET: `/feedback`
+
+To send feedback about your experience using the Parti app, use the `/feedback` API
+
+The API takes as input a required text field, an optional phone number and option email. The phone number is put into the form xxx-xxx-xxxx as long as the input has 10 digits.
+The API also accounts for users trying to manually separate the area code and certain digits with parenthesis and hyphens.
+
+Example:
+
+```
+[
+    {
+        "info": "I really enjoy using Parti",
+        "emailOrHandle": "test123@gmail.com",
+        "phone": "8493494834"
+    }
+]
+
+```
+
+Response:
+
+```
+{
+    "message": "Feedback NVuPlCH9UG0Sv35HuruN created"
+}
+
+```
+
+Database:
+
+```
+[
+    {
+        "info": "I really enjoy using Parti",
+        "emailOrHandle": "test123@gmail.com",
+        "phone": "849-349-4834"
     }
 ]
 ```

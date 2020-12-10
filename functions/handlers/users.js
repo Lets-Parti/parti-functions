@@ -9,6 +9,7 @@ const BusBoy = require('busboy');
 const path = require('path'); 
 const os = require('os'); 
 const fs = require('fs'); 
+const { response } = require('express');
 
 firebase.initializeApp(config); 
 
@@ -52,7 +53,7 @@ exports.signup = (request, response) =>
         return response.status(400).json(errors);
 
     const dbPath = `/users/${newUser.userHandle}`;
-    const noImg = 'no_img.png';
+    const noImg = 'no_img.jpg';         
 
     db.doc(dbPath).get()
     .then(doc => {
@@ -91,7 +92,7 @@ exports.signup = (request, response) =>
             }
             userInfoToDatabase.bio = newUser.bio
             userInfoToDatabase.service = newUser.service
-            userInfoToDatabase.tags = [newUser.service]
+            userInfoToDatabase.tags = [newUser.service]             
             userInfoToDatabase.mediaImages = []
         }
         return db.doc(dbPath).set(userInfoToDatabase)
@@ -190,7 +191,8 @@ exports.login = (request, response) =>
 
 exports.getUserByHandle = (request, response) =>
 {
-    const userHandle = request.body.userHandle; 
+    const userHandle = request.params.userhandle; 
+    
     if(userHandle.length == 0)
     {
         return response.status(500).json({error: 'User handle cannot be empty'});
@@ -206,7 +208,14 @@ exports.getUserByHandle = (request, response) =>
             return response.status(500).json({error: `userHandle ${userHandle} does not exist`})
         }else
         {
-            return response.status(201).json({ user: doc.data() });
+            let userData = doc.data(); 
+            if(userData.type === 'service')
+            {
+                return response.status(201).json({user: doc.data()});
+            }else
+            {
+                return response.status(201).json({message: 'Cannot retrieve client type users'});
+            }
         }
     })
     .catch(err => 
@@ -306,7 +315,7 @@ exports.uploadMediaImages = (request, response) =>
     if(type !== 'service')
         return response.status(500).json({type: 'User type must be of type service'});
 
-        const busboy = new BusBoy({ headers: request.headers});
+    const busboy = new BusBoy({ headers: request.headers});
 
     let imageFileName;
     let imageToBeUploaded = {}; 
@@ -338,10 +347,29 @@ exports.uploadMediaImages = (request, response) =>
         .then(() => 
         {
             imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
-            response.status(201).json({
-                message: 'Image ploaded successfully', 
-                url: `${imageUrl}`
-            });
+            const dbPath = `/users/${userHandle}`;
+            db.doc(dbPath).get()
+            .then(doc =>
+            {
+                let mediaImages = doc.data().mediaImages; 
+                mediaImages.push(imageUrl); 
+                db.doc(dbPath).update({mediaImages})
+                .then(res =>
+                {
+                    response.status(201).json({
+                        message: 'Image ploaded successfully', 
+                        url: `${imageUrl}`
+                    });
+                })
+                .catch(err =>
+                {
+                    response.status(500).json({error: err.code});
+                })
+            })
+            .catch(err =>
+            {
+                response.status(500).json({error: err.code});
+            })
         })
         .catch(err =>
         {
@@ -349,4 +377,10 @@ exports.uploadMediaImages = (request, response) =>
         })
     })
     busboy.end(request.rawBody); 
+}
+
+exports.updateUserProfile = (request, response) =>
+{
+    const type = request.user.type
+    return response.json({type})
 }
