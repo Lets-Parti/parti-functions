@@ -9,6 +9,7 @@ const BusBoy = require('busboy');
 const path = require('path'); 
 const os = require('os'); 
 const fs = require('fs'); 
+const { response } = require('express');
 
 firebase.initializeApp(config); 
 
@@ -52,7 +53,7 @@ exports.signup = (request, response) =>
         return response.status(400).json(errors);
 
     const dbPath = `/users/${newUser.userHandle}`;
-    const noImg = 'no_img.png';
+    const noImg = 'no_img.jpg';         
 
     db.doc(dbPath).get()
     .then(doc => {
@@ -314,7 +315,7 @@ exports.uploadMediaImages = (request, response) =>
     if(type !== 'service')
         return response.status(500).json({type: 'User type must be of type service'});
 
-        const busboy = new BusBoy({ headers: request.headers});
+    const busboy = new BusBoy({ headers: request.headers});
 
     let imageFileName;
     let imageToBeUploaded = {}; 
@@ -346,10 +347,29 @@ exports.uploadMediaImages = (request, response) =>
         .then(() => 
         {
             imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
-            response.status(201).json({
-                message: 'Image ploaded successfully', 
-                url: `${imageUrl}`
-            });
+            const dbPath = `/users/${userHandle}`;
+            db.doc(dbPath).get()
+            .then(doc =>
+            {
+                let mediaImages = doc.data().mediaImages; 
+                mediaImages.push(imageUrl); 
+                db.doc(dbPath).update({mediaImages})
+                .then(res =>
+                {
+                    response.status(201).json({
+                        message: 'Image ploaded successfully', 
+                        url: `${imageUrl}`
+                    });
+                })
+                .catch(err =>
+                {
+                    response.status(500).json({error: err.code});
+                })
+            })
+            .catch(err =>
+            {
+                response.status(500).json({error: err.code});
+            })
         })
         .catch(err =>
         {
@@ -357,4 +377,81 @@ exports.uploadMediaImages = (request, response) =>
         })
     })
     busboy.end(request.rawBody); 
+}
+
+exports.updateUserProfile = (request, response) =>
+{
+    const type = request.user.type;
+    const userHandle = request.user.userHandle; 
+    const dbPath = `/users/${userHandle}`;
+    
+    let errors = {}; 
+
+    let newData = {
+        zipcode: request.body.zipcode, 
+        fullName: request.body.fullName,
+        userHandle
+    }
+
+    console.log(newData.fullName)
+    if(!newData.zipcode)
+        errors.zipcode = 'Must include a zipcode object in the request';
+    if(!newData.fullName)
+        errors.fullName = 'Must include a Full Name object in the request'; 
+    if(newData.fullName && isEmpty(newData.fullName))
+        errors.fullName = 'Name cannot be empty';
+    if(newData.zipcode && !isZipcode(newData.zipcode))
+        errors.zipcode = 'Invalid zipcode format';
+
+    if(Object.keys(errors).length > 0)
+    {
+        return response.status(500).json(errors); 
+    }
+
+    if(type === 'client')
+    {   
+        console.log(`Updating client account: ${userHandle}`);
+        db.doc(dbPath).update(newData)
+        .then(() =>
+        {
+            return response.status(201).json({message: `User ${userHandle} updated with new information`});
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({error: `Could not update information for user ${userHandle}`})
+        })
+    }else if(type === 'service') 
+    {
+        newData.tags = request.body.tags;
+        newData.mediaImages =request.body.mediaImages;
+        newData.bio = request.body.bio;
+        
+        if(!newData.tags)
+            errors.tags = 'Must contain tag object in request';
+        if(!newData.mediaImages)
+            errors.mediaImages = 'Must contain mediaImages object in request';      
+        if(!newData.bio)
+            errors.bio = 'Must contain bio object in request';
+
+        if(newData.tags && !Array.isArray(newData.tags))
+            errors.tags = 'tag object must be of type Array';
+        if(newData.mediaImages && !Array.isArray(newData.mediaImages))
+            errors.mediaImages = 'mediaImages object must be of type Array';
+
+        if(Object.keys(errors).length > 0)
+        {
+            return response.status(500).json(errors); 
+        }
+
+        console.log(`Updating service account: ${userHandle}`);
+        db.doc(dbPath).update(newData)
+        .then(() =>
+        {
+            return response.status(201).json({message: `Service ${userHandle} updated with new information`});
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({error: `Could not update information for service ${userHandle}`});
+        })
+    }
 }

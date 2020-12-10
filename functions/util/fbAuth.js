@@ -24,6 +24,11 @@ module.exports = (request, response, next) =>
         request.user.userHandle = data.docs[0].data().userHandle; 
         request.user.type = data.docs[0].data().type; 
         request.user.zipcode = data.docs[0].data().zipcode; 
+
+        if(data.docs[0].data().type === 'service')
+        {
+            request.user.tags = data.docs[0].data().tags; 
+        }
         return next(); 
     })
     .catch(err =>

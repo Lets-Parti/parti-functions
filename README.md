@@ -120,7 +120,7 @@ If successfull the response will return the user's basic information
 
 **Upload a jpg or png file as user's profile image**. POST request body must contain authentication through Bearer token.
 
-**Upload the photo through url encoded**
+**Upload the photo through url encoded**. It will then set the imageUrl as the url
 
 If successful, the response will return:
 
@@ -128,6 +128,52 @@ If successful, the response will return:
 {
     "message": "Image uploaded successfully",
     "url": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/9242079.JPG?alt=media"
+}
+```
+
+## POST: `/user/services/media`
+
+**Upload a jpg or png to the profile's media**. POST request must contain Bearer token of a service account. **Upload the photo through url encoded**. This will add the photo to storage, then add the photo url to the mediaImages array in the service account
+
+If successful, the response will return:
+
+```
+{
+    "message": "Image ploaded successfully",
+    "url": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-1201376-mediaImage.png?alt=media"
+}
+```
+
+## POST: `/account/edit`
+
+**Update the user profile of the current user logged in**. POST request must contain a Bearer token of an account or service.
+
+Sample body for client:
+
+```
+{
+    "zipcode": "00001",
+    "fullName": "Cool Entertainment LLC"
+}
+```
+
+Sample body for service:
+
+```
+{
+    "zipcode": "00001",
+    "fullName": "Cool Entertainment LLC",
+    "tags": ["DJ", "Photography"],
+    "mediaImages": [],
+    "bio": "Best company"
+}
+```
+
+Sample response:
+
+```
+{
+    "message": "(User/Service) 808hertz updated with new information"
 }
 ```
 
@@ -164,7 +210,7 @@ Example Response:
 }
 ```
 
-## POST: `/events/user`
+## GET: `/events`
 
 **Get the list of events of a given user**. A Bearer token is required to specify who the user is.
 
@@ -207,57 +253,6 @@ Return structure:
 ]
 ```
 
-## POST: `/events/id`
-
-**Get a list of events by eventID**. No authorization needed.
-
-To retrieve a list of events by ID, pass an **array** of ids. Example body:
-
-```
-{
-	"ids": ["DCkKbWVxGDbO8sVCpfuZ", "nIljOG40icYuGvq4ZSA5"]
-}
-```
-
-The response will be the details of each event id:
-
-```
-[
-    {
-        "zipcode": "85286",
-        "title": "Mom's Anniversary",
-        "eventDate": "2021-01-12T00:00:00",
-        "services": [
-            {
-                "vendorFound": false,
-                "serviceType": "Photographer",
-                "description": "I need a cool photographer",
-                "service": {}
-            }
-        ],
-        "userHandle": "matt8p",
-        "description": "Mom's 20th!",
-        "createdAt": "2020-11-30T22:49:32.565Z"
-    },
-    {
-        "createdAt": "2020-11-30T22:46:59.721Z",
-        "userHandle": "matt8p",
-        "description": "Matt's 20th Birthday",
-        "zipcode": "85286",
-        "title": "Matt's Birthday",
-        "services": [
-            {
-                "vendorFound": false,
-                "service": {},
-                "serviceType": "DJ",
-                "description": "I need a DJ for my party"
-            }
-        ],
-        "eventDate": "2021-01-12T00:00:00"
-    }
-]
-```
-
 ## GET: `/discover`
 
 To retrieve a list of services nearby, use the `/discover` API
@@ -296,10 +291,10 @@ Example: service: "DJ"
 
 To send feedback about your experience using the Parti app, use the `/feedback` API
 
-The API takes as input a required text field, an optional phone number and option email. The phone number is put into the form xxx-xxx-xxxx as long as the input has 10 digits. 
+The API takes as input a required text field, an optional phone number and option email. The phone number is put into the form xxx-xxx-xxxx as long as the input has 10 digits.
 The API also accounts for users trying to manually separate the area code and certain digits with parenthesis and hyphens.
 
-Example: 
+Example:
 
 ```
 [
@@ -322,6 +317,7 @@ Response:
 ```
 
 Database:
+
 ```
 [
     {
