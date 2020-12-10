@@ -56,31 +56,6 @@ exports.getUsersEvents = (request, response) =>
     })
 }
 
-exports.getEventByID = (request, response) =>
-{
-    const eventIDs = request.body.ids;
-
-    db.collection('events')
-    .where('__name__', 'in', eventIDs)
-    .get()
-    .then((data) =>
-    {
-        let events = [] 
-        data.forEach((doc) =>
-        {
-            let thisDocumentData = doc.data(); 
-            thisDocumentData.eventID = doc.id; 
-            events.push(thisDocumentData); 
-        })
-        return response.json(events); 
-    })
-    .catch(err =>
-    {
-        console.error(err.code); 
-        return response.status(500).json({error: `Could not retrieve events for ids ${eventIDs}`});
-    })
-}
-
 exports.createEvent = (request, response) => 
 {
     if(request.user.type !== 'client')
@@ -151,4 +126,11 @@ exports.createEvent = (request, response) =>
         console.error('error')
         return response.status(500).json({error: `Failed to add new event to /events database ${err}`})
     })
+}
+
+exports.discoverEvents = (request, response) =>
+{
+    const tags = request.user.tags;                         //Retrieve tags from the logged in user 
+    return response.json({tags})
+    //TODO: this method will 
 }

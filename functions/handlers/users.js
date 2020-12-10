@@ -9,6 +9,7 @@ const BusBoy = require('busboy');
 const path = require('path'); 
 const os = require('os'); 
 const fs = require('fs'); 
+const { response } = require('express');
 
 firebase.initializeApp(config); 
 
@@ -357,4 +358,10 @@ exports.uploadMediaImages = (request, response) =>
         })
     })
     busboy.end(request.rawBody); 
+}
+
+exports.updateUserProfile = (request, response) =>
+{
+    const type = request.user.type
+    return response.json({type})
 }
