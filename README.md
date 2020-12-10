@@ -137,6 +137,13 @@ If successful, the response will return:
 
 If successful, the response will return:
 
+```
+{
+    "message": "Image ploaded successfully",
+    "url": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-1201376-mediaImage.png?alt=media"
+}
+```
+
 # `Events` Route API's
 
 ## POST: `/events`
