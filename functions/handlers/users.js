@@ -53,7 +53,7 @@ exports.signup = (request, response) =>
         return response.status(400).json(errors);
 
     const dbPath = `/users/${newUser.userHandle}`;
-    const noImg = 'no_img.png';
+    const noImg = 'no_img.jpg';         
 
     db.doc(dbPath).get()
     .then(doc => {
