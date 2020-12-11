@@ -379,8 +379,123 @@ exports.uploadMediaImages = (request, response) =>
     busboy.end(request.rawBody); 
 }
 
+exports.deleteMediaImage = (request, response) =>
+{
+    const targetIndex = request.body.index; 
+    const userHandle = request.user.userHandle; 
+    const type = request.user.type; 
+    console.log(targetIndex)
+    if(type !== 'service')
+        return response.status(500).json({type: 'User type must be of type service'});
+    const dbPath = `/users/${userHandle}`;
+
+    db.doc(dbPath).get()
+    .then(doc =>
+    {
+        let mediaImages = doc.data().mediaImages; 
+        if(targetIndex >= mediaImages.length)
+            return response.status(500).json({error: 'Index out of bounds'});
+        let targetImageURL = mediaImages[targetIndex];
+        let imageFileName = targetImageURL.split('https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/')[1];
+        imageFileName = imageFileName.split('?')[0];
+
+        console.log('getting ref'); 
+        console.log(imageFileName); 
+
+        let file = admin.storage().bucket().file(imageFileName); 
+        file.delete()
+        .then(() =>
+        {
+            mediaImages.splice(targetIndex, 1); 
+            db.doc(dbPath).update({mediaImages})
+            .then(() =>
+            {
+                return response.status(201).json({message: `File ${imageFileName} deleted from doc`});
+            })
+            .catch(err=>
+            {
+                return response.status(500).json({err: `Failed to delete file from Firebase`});
+            })
+        })
+        .catch(err=>
+        {
+            return response.status(500).json({err});
+        })
+    })
+    .catch(err=>
+    {
+        return response.status(500).json({error: err});
+    })
+}
+
 exports.updateUserProfile = (request, response) =>
 {
-    const type = request.user.type
-    return response.json({type})
+    const type = request.user.type;
+    const userHandle = request.user.userHandle; 
+    const dbPath = `/users/${userHandle}`;
+    
+    let errors = {}; 
+
+    let newData = {
+        zipcode: request.body.zipcode, 
+        fullName: request.body.fullName,
+        userHandle
+    }
+
+    console.log(newData.fullName)
+    if(!newData.zipcode)
+        errors.zipcode = 'Must include a zipcode object in the request';
+    if(!newData.fullName)
+        errors.fullName = 'Must include a Full Name object in the request'; 
+    if(newData.fullName && isEmpty(newData.fullName))
+        errors.fullName = 'Name cannot be empty';
+    if(newData.zipcode && !isZipcode(newData.zipcode))
+        errors.zipcode = 'Invalid zipcode format';
+
+    if(Object.keys(errors).length > 0)
+    {
+        return response.status(500).json(errors); 
+    }
+
+    if(type === 'client')
+    {   
+        console.log(`Updating client account: ${userHandle}`);
+        db.doc(dbPath).update(newData)
+        .then(() =>
+        {
+            return response.status(201).json({message: `User ${userHandle} updated with new information`});
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({error: `Could not update information for user ${userHandle}`})
+        })
+    }else if(type === 'service') 
+    {
+        newData.tags = request.body.tags;
+        newData.bio = request.body.bio;
+        
+        if(!newData.tags)
+            errors.tags = 'Must contain tag object in request';   
+        if(!newData.bio)
+            errors.bio = 'Must contain bio object in request';
+
+        if(newData.tags && !Array.isArray(newData.tags))
+            errors.tags = 'tag object must be of type Array';
+
+        if(Object.keys(errors).length > 0)
+        {
+            return response.status(500).json(errors); 
+        }
+
+        console.log(`Updating service account: ${userHandle}`);
+        db.doc(dbPath).update(newData)
+        .then(() =>
+        {
+            return response.status(201).json({message: `Service ${userHandle} updated with new information`});
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({error: `Could not update information for service ${userHandle}`});
+        })
+    }
 }

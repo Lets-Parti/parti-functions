@@ -144,6 +144,59 @@ If successful, the response will return:
 }
 ```
 
+## POST: `/user/services/media/delete`
+
+**Delete an image from the user's media**. POST request must contain Bearer token of a service account. The body must contain a variable index that points to which index in the array of `mediaImages` you want to delete
+
+Sample input:
+
+```
+{
+    "index": 0
+}
+```
+
+If successful, the response will return:
+
+```
+{
+    "message": "file xxx deleted from doc",
+}
+```
+
+## POST: `/account/edit`
+
+**Update the user profile of the current user logged in**. POST request must contain a Bearer token of an account or service.
+
+Sample body for client:
+
+```
+{
+    "zipcode": "00001",
+    "fullName": "Cool Entertainment LLC"
+}
+```
+
+Sample body for service:
+
+```
+{
+    "zipcode": "00001",
+    "fullName": "Cool Entertainment LLC",
+    "tags": ["DJ", "Photography"],
+    "mediaImages": [],
+    "bio": "Best company"
+}
+```
+
+Sample response:
+
+```
+{
+    "message": "(User/Service) 808hertz updated with new information"
+}
+```
+
 # `Events` Route API's
 
 ## POST: `/events`
