@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const express = require('express');
 
 const { createEvent, getUsersEvents, discoverEvents } = require('./handlers/events');
-const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile } = require('./handlers/users');
+const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage } = require('./handlers/users');
 const { getNearbyServices } = require('./handlers/discover');
 const { getNearbyServicess } = require('./handlers/discoverEvents');
 const { getEventByIDs } = require('./handlers/discoverEvents');
@@ -31,6 +31,7 @@ app.post('/account/edit', FirebaseAuth, updateUserProfile)
 
 app.post('/user/image', FirebaseAuth, uploadProfileImage);
 app.post('/user/services/media', FirebaseAuth, uploadMediaImages);
+app.post('/user/services/media/delete', FirebaseAuth, deleteMediaImage);
 
 // discover routes
 app.get('/discover', getNearbyServices);
