@@ -379,6 +379,55 @@ exports.uploadMediaImages = (request, response) =>
     busboy.end(request.rawBody); 
 }
 
+exports.deleteMediaImage = (request, response) =>
+{
+    const targetIndex = request.body.index; 
+    const userHandle = request.user.userHandle; 
+    const type = request.user.type; 
+    console.log(targetIndex)
+    if(type !== 'service')
+        return response.status(500).json({type: 'User type must be of type service'});
+    const dbPath = `/users/${userHandle}`;
+
+    db.doc(dbPath).get()
+    .then(doc =>
+    {
+        let mediaImages = doc.data().mediaImages; 
+        if(targetIndex >= mediaImages.length)
+            return response.status(500).json({error: 'Index out of bounds'});
+        let targetImageURL = mediaImages[targetIndex];
+        let imageFileName = targetImageURL.split('https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/')[1];
+        imageFileName = imageFileName.split('?')[0];
+
+        console.log('getting ref'); 
+        console.log(imageFileName); 
+
+        let file = admin.storage().bucket().file(imageFileName); 
+        file.delete()
+        .then(() =>
+        {
+            mediaImages.splice(targetIndex, 1); 
+            db.doc(dbPath).update({mediaImages})
+            .then(() =>
+            {
+                return response.status(201).json({message: `File ${imageFileName} deleted from doc`});
+            })
+            .catch(err=>
+            {
+                return response.status(500).json({err: `Failed to delete file from Firebase`});
+            })
+        })
+        .catch(err=>
+        {
+            return response.status(500).json({err});
+        })
+    })
+    .catch(err=>
+    {
+        return response.status(500).json({error: err});
+    })
+}
+
 exports.updateUserProfile = (request, response) =>
 {
     const type = request.user.type;
@@ -423,20 +472,15 @@ exports.updateUserProfile = (request, response) =>
     }else if(type === 'service') 
     {
         newData.tags = request.body.tags;
-        newData.mediaImages =request.body.mediaImages;
         newData.bio = request.body.bio;
         
         if(!newData.tags)
-            errors.tags = 'Must contain tag object in request';
-        if(!newData.mediaImages)
-            errors.mediaImages = 'Must contain mediaImages object in request';      
+            errors.tags = 'Must contain tag object in request';   
         if(!newData.bio)
             errors.bio = 'Must contain bio object in request';
 
         if(newData.tags && !Array.isArray(newData.tags))
             errors.tags = 'tag object must be of type Array';
-        if(newData.mediaImages && !Array.isArray(newData.mediaImages))
-            errors.mediaImages = 'mediaImages object must be of type Array';
 
         if(Object.keys(errors).length > 0)
         {
