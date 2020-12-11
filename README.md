@@ -184,7 +184,6 @@ Sample body for service:
     "zipcode": "00001",
     "fullName": "Cool Entertainment LLC",
     "tags": ["DJ", "Photography"],
-    "mediaImages": [],
     "bio": "Best company"
 }
 ```
