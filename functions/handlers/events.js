@@ -134,3 +134,4 @@ exports.discoverEvents = (request, response) =>
     return response.json({tags})
     //TODO: this method will 
 }
+

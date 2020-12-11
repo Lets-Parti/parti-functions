@@ -4,8 +4,8 @@ const express = require('express');
 const { createEvent, getUsersEvents, discoverEvents } = require('./handlers/events');
 const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile } = require('./handlers/users');
 const { getNearbyServices } = require('./handlers/discover');
-const { getNearbyServicess } = require('./handlers/discoverEvents');
-const { getEventByIDs } = require('./handlers/discoverEvents');
+const { getEventsForDiscover } = require('./handlers/discoverEvents');
+// const { getEventByIDs } = require('./handlers/discoverEvents');
 const { feedback } = require('./handlers/feedback');
 const FirebaseAuth = require('./util/fbAuth');
 
@@ -19,7 +19,7 @@ app.get('/events', FirebaseAuth, getUsersEvents);
 app.post('/events', FirebaseAuth, createEvent);
 
 //TODO: Jake & Anish
-app.get('/events/discover', FirebaseAuth, discoverEvents); 
+app.get('/events', FirebaseAuth, getEventsForDiscover); 
 
 // user routes 
 app.post('/signup', signup);
@@ -35,7 +35,7 @@ app.post('/user/services/media', FirebaseAuth, uploadMediaImages);
 // discover routes
 app.get('/discover', getNearbyServices);
 // app.get('/discoverEvents', getNearbyServicess);
-app.get('/discoverEvents', getEventByIDs);
+// app.get('/discoverEvents', getEventsForDiscover);
 
 //feedback routes
 app.post('/feedback', feedback);
