@@ -268,7 +268,7 @@ exports.uploadProfileImage = (request, response) =>
         if(mimetype !== 'image/jpeg' && mimetype !== 'image/png')
             return response.status(400).json({ error: 'Wrong file type submitted'});
 
-        const imageExtention = filename.split('.')[filename.split('.').length - 1];     //Get the file type (.png, .jpt, ext)
+        const imageExtention = filename.split('.')[filename.split('.').length - 1].toLowerCase();     //Get the file type (.png, .jpt, ext)
         imageFileName = `${userHandle}-profileImage.${imageExtention}`; 
         const filepath = path.join(os.tmpdir(), imageFileName);
         imageToBeUploaded = { filepath, mimetype }; 
@@ -325,7 +325,7 @@ exports.uploadMediaImages = (request, response) =>
         if(mimetype !== 'image/jpeg' && mimetype !== 'image/png')
             return response.status(400).json({ error: 'Wrong file type submitted'});
 
-        const imageExtention = filename.split('.')[filename.split('.').length - 1];     //Get the file type (.png, .jpt, ext)
+        const imageExtention = filename.split('.')[filename.split('.').length - 1].toLowerCase();     //Get the file type (.png, .jpt, ext)
         const randomGeneratedNumber = Math.floor(Math.random() * Math.floor(10000000));
         imageFileName = `${userHandle}-${randomGeneratedNumber}-mediaImage.${imageExtention}`; 
         const filepath = path.join(os.tmpdir(), imageFileName);
