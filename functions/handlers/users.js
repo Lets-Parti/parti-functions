@@ -472,20 +472,15 @@ exports.updateUserProfile = (request, response) =>
     }else if(type === 'service') 
     {
         newData.tags = request.body.tags;
-        newData.mediaImages =request.body.mediaImages;
         newData.bio = request.body.bio;
         
         if(!newData.tags)
-            errors.tags = 'Must contain tag object in request';
-        if(!newData.mediaImages)
-            errors.mediaImages = 'Must contain mediaImages object in request';      
+            errors.tags = 'Must contain tag object in request';   
         if(!newData.bio)
             errors.bio = 'Must contain bio object in request';
 
         if(newData.tags && !Array.isArray(newData.tags))
             errors.tags = 'tag object must be of type Array';
-        if(newData.mediaImages && !Array.isArray(newData.mediaImages))
-            errors.mediaImages = 'mediaImages object must be of type Array';
 
         if(Object.keys(errors).length > 0)
         {
