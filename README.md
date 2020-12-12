@@ -306,6 +306,42 @@ Example: service: "DJ"
 ]
 ```
 
+## GET: `/discover/events`
+
+To allow services to retrieve a list of events requiring services that they provide Use the `/discover/events` API
+
+This API requires a bearer token of a service type account. This API will find intersection between the service's tags and a list of services the events require. It filters out events that are expired. 
+
+Example: 808Hertz's tags is `[Food Truck]`. This will scan for all events in the DB that are asking for Food Trucks
+
+```
+{[
+    {
+        "userHandle": "Heller",
+        "createdAt": "2020-12-05T20:02:12.452Z",
+        "services": [
+            {
+                "vendorFound": false,
+                "serviceType": "DJ",
+                "description": "Must be familiar with bar mitzvahs",
+                "service": {}
+            },
+            {
+                "serviceType": "Food Truck",
+                "description": "Food truck that can serve kosher food",
+                "vendorFound": false,
+                "service": {}
+            }
+        ],
+        "title": "Isaac's Bar Mitzvah",
+        "zipcode": "20778",
+        "eventDate": "2020-12-25T19:56:00.000Z",
+        "description": "Isaac's Bar Mitzvah, it's going to be wild!!"
+    }
+]}
+
+```
+
 ## GET: `/feedback`
 
 To send feedback about your experience using the Parti app, use the `/feedback` API
