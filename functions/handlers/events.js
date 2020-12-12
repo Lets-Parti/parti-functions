@@ -128,9 +128,3 @@ exports.createEvent = (request, response) =>
     })
 }
 
-exports.discoverEvents = (request, response) =>
-{
-    const tags = request.user.tags;                         //Retrieve tags from the logged in user 
-    return response.json({tags})
-    //TODO: this method will 
-}
