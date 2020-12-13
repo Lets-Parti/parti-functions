@@ -22,6 +22,7 @@ exports.containsSpecialCharacters = (str) => {
 
 exports.isPhone = (str) => {
     //const regex = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
+    if(!str.match(/\d/g)) return false; 
     return str.match(/\d/g).length===10;
 }
 
