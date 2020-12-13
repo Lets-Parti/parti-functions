@@ -103,6 +103,7 @@ If successfull the response will return the user's basic information
         "fullName": "808Hertz Entertainment",
         "userID": "hH72cr8FK0d48efuxdP3Gm8v3Y72",
         "type": "service",
+        "phone": "123-456-7899",
         "mediaImages": [],
         "bio": "808Hertz is the best entertainment company in the valley. We provide services such as DJing and Photography ",
         "service": "Photography",
@@ -292,6 +293,7 @@ Example: service: "DJ"
         "userID": "eJl8n5Rjczbc7DBnvbLzmGu2CZd2",
         "type": "service",
         "userHandle": "808hz",
+        "phone": "123-456-7899",
         "tags": [
         "DJ",
         "Lighting",
