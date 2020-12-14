@@ -45,11 +45,20 @@ exports.createContract = (request, response) =>
         if(!clientEvents.includes(newContract.eventID))
             return response.status(500).json({eventID: `Invalid event ID for user ${newContract.clientHandle}`}); 
         
-        return response.status(201).json({message: 'event found'});
+        let contractID; 
+        db.collection('contracts').add(newContract)
+        .then(doc =>
+        {
+            contractID = doc.id; 
+            return db.doc(`/contracts/${contractID}`).update({contractID});              //Insert Event ID 
+        })
+        .then(() =>
+        {
+            return response.status(201).json({message: `Contract ${contractID} successfully created`});
+        })
     })
     .catch(err =>
     {
-    
         return response.status(500).json(err); 
     })
 }
