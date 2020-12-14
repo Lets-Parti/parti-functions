@@ -5,6 +5,7 @@ const { createEvent, getUsersEvents } = require('./handlers/events');
 const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage } = require('./handlers/users');
 const { discoverServices, discoverEvents } = require('./handlers/discover');
 const { feedback } = require('./handlers/feedback');
+const { createContract, signContract } = require('./handlers/contracts');
 const FirebaseAuth = require('./util/fbAuth');
 
 const app = express()
@@ -21,6 +22,7 @@ app.post('/signup', signup);
 app.post('/login', login);
 app.get('/user/:userhandle', getUserByHandle);
 app.get('/user', FirebaseAuth, getAuthenticatedUser);
+
 //TODO: Matt & Aaric
 app.post('/account/edit', FirebaseAuth, updateUserProfile)
 
@@ -34,6 +36,10 @@ app.get('/discover/events', FirebaseAuth, discoverEvents);
 
 //feedback routes
 app.post('/feedback', feedback);
+
+//contract routes 
+app.post('/contract', FirebaseAuth, createContract);
+app.post('/contract/sign', FirebaseAuth, signContract);
 
 exports.api = functions.https.onRequest(app)
 
