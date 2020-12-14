@@ -13,9 +13,12 @@ exports.createContract = (request, response) =>
     
     const newContract = {
         serviceHandle, 
+        createdAt: new Date().toISOString(),
         clientHandle: request.body.clientHandle, 
         eventID: request.body.eventID, 
+        tags: request.body.tags, 
         signed: false, 
+        active: true, 
         fees: request.body.fees, 
         body: request.body.body, 
         serviceMemo: '',
@@ -31,7 +34,9 @@ exports.createContract = (request, response) =>
         errors.contractBody = 'Contract body cannot be empty'
     if(isEmpty(newContract.eventID))
         errors.eventID = 'Event ID cannot be empty'
-    
+    if(!newContract.tags || newContract.tags.length === 0)
+        errors.tags = 'Must contain at least 1 service provided'
+
     if(Object.keys(errors).length > 0)
         return response.status(500).json(errors); 
     
@@ -50,11 +55,15 @@ exports.createContract = (request, response) =>
         .then(doc =>
         {
             contractID = doc.id; 
-            return db.doc(`/contracts/${contractID}`).update({contractID});              //Insert Event ID 
+            return db.doc(`/contracts/${contractID}`).update({contractID});              //Insert Contract ID 
         })
         .then(() =>
         {
             return response.status(201).json({message: `Contract ${contractID} successfully created`});
+        })
+        .then(() =>
+        {
+            //TODO: Send a notification to the client that a contract has been created. 
         })
     })
     .catch(err =>
@@ -62,3 +71,60 @@ exports.createContract = (request, response) =>
         return response.status(500).json(err); 
     })
 }
+
+exports.signContract = (request, response) =>
+{
+    const userType = request.user.type; 
+    const contractID = request.body.contractID; 
+
+    if(userType !== 'client')
+        return response.status(500).json({type: 'User must be of type client to sign a contract'});
+
+    let eventID; 
+    let contractTags; 
+    let serviceHandle; 
+
+    db.doc(`/contracts/${contractID}`).get()
+    .then(doc =>
+    {
+        if(!doc.exists)
+            return response.status(500).json({contractID: 'Contract ID does not exist'});
+        eventID = doc.data().eventID; 
+        contractTags = doc.data().tags; 
+        serviceHandle = doc.data().serviceHandle; 
+        return db.doc(`/contracts/${contractID}`).update({signed: true}); 
+    })                                                               
+    .then(() =>
+    {
+        db.doc(`/events/${eventID}`).get()
+        .then(event =>
+        {
+            let services = event.data().services; 
+            services.forEach(service =>
+            {
+                if(contractTags.includes(service.serviceType))
+                {
+                    service.vendorFound = true; 
+                    service.service = {
+                        "userHandle": serviceHandle, 
+                        "contractID": contractID
+                    }
+                }
+            })
+            return db.doc(`/events/${eventID}`).update({services})
+        })
+        .then(() =>
+        {
+            return response.status(201).json({message: `Signed contract ${contractID}`}); 
+        })
+        .catch(err =>
+        {
+            return response.status(500).json(err); 
+        })
+    })
+    .catch(err =>
+    {
+        return response.status(500).json(err); 
+    })
+}
+
