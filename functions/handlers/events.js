@@ -91,19 +91,23 @@ exports.createEvent = (request, response) =>
         }
     })
     
-
     if(Object.keys(errors).length > 0)
     {
         return response.status(400).json(errors); 
     }
 
+    let eventID; 
     db.collection('events')
     .add(newEvent)
     .then((doc) =>
     { 
-        let eventID = doc.id;
+        eventID = doc.id;
+        console.log(eventID); 
+        return db.doc(`/events/${eventID}`).update({eventID});              //Insert Event ID 
+    })
+    .then(() =>
+    {
         const userDBPath = `/users/${newEvent.userHandle}`;
-    
         db.doc(userDBPath).get()                                                                        //Retrieve current user's events
         .then(data =>
         {
