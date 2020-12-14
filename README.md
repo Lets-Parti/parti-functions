@@ -280,34 +280,44 @@ Return structure:
 ## GET: `/discover`
 
 To retrieve a list of services nearby, use the `/discover` API
-This GET request requires a header with key `service`. It will then return a list of services that contain the header service value in the account tag.
+This GET request requires a header with key `service`. It will then return a list of services that contain the tags that the user inputs. If no tags are entered, then the search displays all services. The search query gets narrower with the tags intersection as more tags are inputted by the user. The array is formed by comma separation.
 
-Example: service: "DJ"
+Example: service: "DJ, Food Truck"
 
 ```
 [
     {
-        "fullName": "808Hertz Entertainment",
-        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/no_img.png?alt=media",
-        "email": "808hertz@gmail.com",
-        "userID": "eJl8n5Rjczbc7DBnvbLzmGu2CZd2",
-        "type": "service",
-        "userHandle": "808hz",
-        "phone": "123-456-7899",
-        "tags": [
-        "DJ",
-        "Lighting",
-        "Photography"
+        "mediaImages": [
+            "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-9107710-mediaImage.jpg?alt=media",
+            "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-4941894-mediaImage.jpg?alt=media",
+            "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-9097559-mediaImage.jpg?alt=media",
+            "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-4754311-mediaImage.jpeg?alt=media",
+            "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-802409-mediaImage.jpg?alt=media"
         ],
-        "bio": "We are the best entertainment company in the valley",
-        "events": [],
         "zipcode": "85286",
-        "createdAt": "2020-12-07T00:29:05.790Z",
+        "bio": "We are 808Hertz Entertainment LLC, a professional entertainment service in the Arizona valley. Our service provides quality DJ, lighting, and event photography to turn your event into an unforgettable time of your life. We are students at Arizona State University who turned our musical inclination into a DJ service with much more, and we want you to experience our passion in every song we play. We also provide professional photography services as well!",
+        "createdAt": "2020-12-09T18:50:12.956Z",
+        "userHandle": "808hertz",
+        "email": "808hertz@gmail.com",
+        "imageUrl": "https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/808hertz-profileImage.jpg?alt=media",
+        "events": [],
+        "userID": "hH72cr8FK0d48efuxdP3Gm8v3Y72",
+        "tags": [
+            "DJ",
+            "Photography",
+            "Food Truck",
+            "Live Band",
+            "Food Catering"
+        ],
         "reviews": {
-        "reviews": [],
-        "averageStars": 0,
-        "numberOfReviews": 0
-        }
+            "numberOfReviews": 0,
+            "averageStars": 0,
+            "reviews": []
+        },
+        "service": "DJ",
+        "phone": "480-480-4800",
+        "type": "service",
+        "fullName": "808Hertz Entertainment "
     }
 ]
 ```

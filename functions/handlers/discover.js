@@ -4,18 +4,21 @@ const config = require('../util/config');
 const { isEmail, isEmpty, isZipcode, containsSpecialCharacters } = require('../util/validators');
 const axios = require('axios');
 
-exports.discoverServices = (request, response) => 
-{
+exports.discoverServices = (request, response) => {
     let service = request.headers.service;
+    let tagArray = service.split(',');
 
     if (service.length > 0) {
         db.collection('users')
-            .where('tags', 'array-contains', service)
+            .where('type', '==', 'service')
             .get()
             .then(data => {
                 let services = [];
                 data.forEach(doc => {
-                    services.push(doc.data());
+                    let serviceTags = doc.data().tags;
+                    const filteredArray = tagArray.filter(value => serviceTags.includes(value));
+                    if (tagArray.length === filteredArray.length)
+                        services.push(doc.data());
                 })
                 response.json(services);
             })
@@ -39,37 +42,32 @@ exports.discoverServices = (request, response) =>
     }
 }
 
-exports.discoverEvents = (request, response) =>
-{
-    if(request.user.type !== 'service')
-        return response.status(500).json({error: 'Must be of type service to get events'});
+exports.discoverEvents = (request, response) => {
+    if (request.user.type !== 'service')
+        return response.status(500).json({ error: 'Must be of type service to get events' });
 
-    const tags = request.user.tags; 
-    const today = new Date().toISOString(); 
+    const tags = request.user.tags;
+    const today = new Date().toISOString();
 
     db.collection('events')
-    .where('eventDate', '>' , today)
-    .get()
-    .then(data =>
-    {
-        let services = [];
+        .where('eventDate', '>', today)
+        .get()
+        .then(data => {
+            let services = [];
 
-        data.forEach(doc => {
-            let servicesRequested = []
-            doc.data().services.forEach(service => 
-            {
-                servicesRequested.push(service.serviceType); 
-            });
-            const filteredArray = tags.filter(value => servicesRequested.includes(value));
-            if (filteredArray.length > 0)
-            {
-                services.push(doc.data());
-            }
+            data.forEach(doc => {
+                let servicesRequested = []
+                doc.data().services.forEach(service => {
+                    servicesRequested.push(service.serviceType);
+                });
+                const filteredArray = tags.filter(value => servicesRequested.includes(value));
+                if (filteredArray.length > 0) {
+                    services.push(doc.data());
+                }
+            })
+            response.json(services);
         })
-        response.json(services);
-    })
-    .catch(err=>
-    {
-        return response.status(500).json({error: 'shit went south'});
-    })
+        .catch(err => {
+            return response.status(500).json({ error: 'shit went south' });
+        })
 }
