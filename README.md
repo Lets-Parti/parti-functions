@@ -10,7 +10,7 @@ To visualize the structure of the database, check out the file `dbschema.js`
 
 **Create a new account and return token**. No authorization is needed to run this endpoint. The POST Request body must contain the following parameters:
 
-`[userHandle, fullName, email, password, confirmPassword, type, zipcode]`
+`[userHandle, fullName, email, phone, password, confirmPassword, type, zipcode]`
 
 - password and confirmPassword must be same
 - userHandle and email must not already be taken
@@ -25,6 +25,7 @@ For 'client' type accounts
     "userHandle": "matt8p",
     "fullName": "Matthew Wang",
     "email": "matt8p@gmail.com",
+    "phone": "4805678238",
     "password": "pass123",
     "confirmPassword": "pass123",
     "type": "client",
@@ -39,6 +40,7 @@ For 'service' type accounts
     "userHandle": "808hz",
     "fullName": "808Hertz Entertainment",
     "email": "808hertz@gmail.com",
+    "phone": "4805678238"
     "password": "pass123",
     "confirmPassword": "pass123",
     "bio": "We are the best entertainment company in the valley",
@@ -101,6 +103,7 @@ If successfull the response will return the user's basic information
         "fullName": "808Hertz Entertainment",
         "userID": "hH72cr8FK0d48efuxdP3Gm8v3Y72",
         "type": "service",
+        "phone": "123-456-7899",
         "mediaImages": [],
         "bio": "808Hertz is the best entertainment company in the valley. We provide services such as DJing and Photography ",
         "service": "Photography",
@@ -173,6 +176,7 @@ Sample body for client:
 ```
 {
     "zipcode": "00001",
+    "phone": "1234567899",
     "fullName": "Cool Entertainment LLC"
 }
 ```
@@ -183,6 +187,7 @@ Sample body for service:
 {
     "zipcode": "00001",
     "fullName": "Cool Entertainment LLC",
+    "phone": "1234567899",
     "tags": ["DJ", "Photography"],
     "bio": "Best company"
 }
@@ -288,6 +293,7 @@ Example: service: "DJ"
         "userID": "eJl8n5Rjczbc7DBnvbLzmGu2CZd2",
         "type": "service",
         "userHandle": "808hz",
+        "phone": "123-456-7899",
         "tags": [
         "DJ",
         "Lighting",
@@ -310,7 +316,7 @@ Example: service: "DJ"
 
 To allow services to retrieve a list of events requiring services that they provide Use the `/discover/events` API
 
-This API requires a bearer token of a service type account. This API will find intersection between the service's tags and a list of services the events require. It filters out events that are expired. 
+This API requires a bearer token of a service type account. This API will find intersection between the service's tags and a list of services the events require. It filters out events that are expired.
 
 Example: 808Hertz's tags is `[Food Truck]`. This will scan for all events in the DB that are asking for Food Trucks
 
