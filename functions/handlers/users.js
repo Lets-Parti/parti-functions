@@ -1,7 +1,7 @@
 const {admin, db} = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
-const {isEmail, isEmpty, isZipcode, containsSpecialCharacters} = require('../util/validators');
+const {isEmail, isEmpty, isZipcode, containsSpecialCharacters, isPhone, getDigits} = require('../util/validators');
 const { user, service } = require('firebase-functions/lib/providers/auth');
 
 //Image upload modules
@@ -22,36 +22,41 @@ exports.signup = (request, response) =>
         userHandle: request.body.userHandle, 
         fullName: request.body.fullName, 
         email: request.body.email, 
+        phone: request.body.phone, 
+        zipcode: request.body.zipcode,
         password: request.body.password, 
         confirmPassword: request.body.confirmPassword,
-        bio: request.body.bio, 
         type: request.body.type, 
-        zipcode: request.body.zipcode,
+        bio: request.body.bio, 
         service: request.body.service
     };
 
     console.log(newUser); 
     errors = {};
-    if(!isEmail(newUser.email))
+    if(!isEmail(newUser.email))                                             //Email error handling 
         errors.email = 'Invalid email format'
-    if(newUser.userHandle === null || isEmpty(newUser.userHandle))
+    if(!newUser.userHandle || isEmpty(newUser.userHandle))          //UserHandle error handling 
         errors.userHandle = 'Username cannot be empty'
-    if(containsSpecialCharacters(newUser.userHandle))
+    if(containsSpecialCharacters(newUser.userHandle))                       //UserHandle error handling 
         errors.userHandle = 'Username must not contain special characters'
-    if(newUser.fullName === null || isEmpty(newUser.fullName))
+    if(!newUser.fullName || isEmpty(newUser.fullName))              //FullName error handling 
         errors.fullName = 'Full Name cannot be empty'
-    if(!isZipcode(newUser.zipcode))
+    if(!isZipcode(newUser.zipcode))                                         //zipcode error handling 
         errors.zipcode = 'Invalid zipcode format';
-    if(newUser.type !== 'client' && newUser.type !== 'service')
+    if(newUser.type !== 'client' && newUser.type !== 'service')             //type handling 
         errors.type = 'Type must be type client or service';
-    if(newUser.password !== newUser.confirmPassword)
-        errors.confirmPassword = 'Passwords must match';
-    if(newUser.type === 'service' && (!newUser.service || isEmpty(newUser.service)))
+    if(newUser.type === 'service' && (!newUser.service || isEmpty(newUser.service)))    //type handling 
         errors.service = 'Service type cannot be left empty'
-
+    if(newUser.password !== newUser.confirmPassword)                        //Password handling 
+        errors.confirmPassword = 'Passwords must match';
+    if(!isPhone(newUser.phone))
+        errors.phone = 'Invalid phone number. (10-digit number)'
+    
     if(Object.keys(errors).length > 0)
         return response.status(400).json(errors);
 
+    newUser.phone = getDigits(newUser.phone); 
+        
     const dbPath = `/users/${newUser.userHandle}`;
     const noImg = 'no_img.jpg';         
 
@@ -73,6 +78,7 @@ exports.signup = (request, response) =>
         let userInfoToDatabase = {
             userID: userUID,
             email: newUser.email, 
+            phone: newUser.phone,
             userHandle: newUser.userHandle, 
             fullName: newUser.fullName, 
             zipcode: newUser.zipcode,
@@ -439,10 +445,9 @@ exports.updateUserProfile = (request, response) =>
     let newData = {
         zipcode: request.body.zipcode, 
         fullName: request.body.fullName,
-        userHandle
+        phone: request.body.phone
     }
 
-    console.log(newData.fullName)
     if(!newData.zipcode)
         errors.zipcode = 'Must include a zipcode object in the request';
     if(!newData.fullName)
@@ -451,11 +456,15 @@ exports.updateUserProfile = (request, response) =>
         errors.fullName = 'Name cannot be empty';
     if(newData.zipcode && !isZipcode(newData.zipcode))
         errors.zipcode = 'Invalid zipcode format';
-
+    if(!isPhone(newData.phone))
+        errors.phone = 'Invalid phone number. (10-digit number)'
+    
     if(Object.keys(errors).length > 0)
     {
         return response.status(500).json(errors); 
     }
+
+    newData.phone = getDigits(newData.phone) //Convert number into XXX-XXX-XXXX format 
 
     if(type === 'client')
     {   
