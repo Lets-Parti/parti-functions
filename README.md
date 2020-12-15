@@ -219,8 +219,7 @@ Example Body:
 		{
 			"serviceType": "DJ",
 			"description": "I need a DJ for my party",
-			"vendorFound": false,
-			"service": {}
+			"service": null
 		}
 	]
 }
