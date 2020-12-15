@@ -398,3 +398,43 @@ Database:
     }
 ]
 ```
+
+# `Contract` Route API's
+
+## POST: `/contract`
+
+** Create a new contract **. The API requires a Bearer token of type 'service' (Only services can create contracts).
+Provide the client's handle, eventID, fees, tags (what service(s) are provided?), and contract body
+
+```
+{
+    "clientHandle": "matt8p",
+    "eventID": "14GJ9yOUFbTQwwny6Iee",
+    "fees": [
+        {"name": "DJ Services", "cost": 800},
+        {"name": "Service Fee", "cost": 325}
+    ],
+    "tags": ["DJ", "Photography"],
+    "body": "We will provide a lot "
+}
+```
+
+Successful response:
+
+```
+{
+    "message": "Contract ABCDS23dgdsjklas successfully created"
+}
+```
+
+## POST: `/contract/sign`
+
+** Sign a contract **. The API requires a Bearer token of type 'client'. (Only clients can sign a contract). The input is the contractID that is being approved.
+
+Sample input:
+
+```
+{
+    "contractID": "v5AFaMcYsIOGfjKdoJ0i"
+}
+```
