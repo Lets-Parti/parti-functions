@@ -83,12 +83,16 @@ exports.createEvent = (request, response) =>
     if(newEvent.services.length === 0)
         errors.serviceType = 'Must submit one or more services'
 
+    let serviceTypes = []; 
     newEvent.services.forEach(service =>
     {
+        if(serviceTypes.includes(service.serviceType))
+            errors.serviceType = 'Cannot have duplicate services'
         if(!service.serviceType || service.serviceType === null || isEmpty(service.serviceType))
         {
-            errors.serviceType = 'One or more services missing'
+            errors.serviceType = 'Cannot leave service empty'
         }
+        serviceTypes.push(service.serviceType); 
     })
     
     if(Object.keys(errors).length > 0)
