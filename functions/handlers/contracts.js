@@ -104,7 +104,6 @@ exports.signContract = (request, response) =>
             {
                 if(contractTags.includes(service.serviceType))
                 {
-                    service.vendorFound = true; 
                     service.service = {
                         "userHandle": serviceHandle, 
                         "contractID": contractID
