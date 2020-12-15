@@ -456,7 +456,7 @@ exports.updateUserProfile = (request, response) =>
         errors.fullName = 'Name cannot be empty';
     if(newData.zipcode && !isZipcode(newData.zipcode))
         errors.zipcode = 'Invalid zipcode format';
-    if(!isPhone(newData.phone))
+    if(!isPhone(newData.phone) || newData.phone === null)
         errors.phone = 'Invalid phone number. (10-digit number)'
     
     if(Object.keys(errors).length > 0)
