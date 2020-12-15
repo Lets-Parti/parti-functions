@@ -437,3 +437,15 @@ Sample input:
     "contractID": "v5AFaMcYsIOGfjKdoJ0i"
 }
 ```
+
+## POST: `/contract/delete`
+
+** Delete a contract **. The API requires a Bearer token of any type. Only those whose handles are on the contract can delete the contract. Deleting the contract will set the contract's `active` field to false. It will then remove the contract from its placement in `events`
+
+Sample input:
+
+```
+{
+    "contractID": "v5AFaMcYsIOGfjKdoJ0i"
+}
+```

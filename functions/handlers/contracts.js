@@ -127,3 +127,55 @@ exports.signContract = (request, response) =>
     })
 }
 
+exports.deleteContract = (request, response) =>
+{
+    const contractID = request.body.contractID; 
+    let userHandle = request.user.userHandle; 
+        
+    let eventID; 
+    db.doc(`/contracts/${contractID}`).get()
+    .then(doc =>
+    {
+        if(!doc.exists)
+            return response.status(500).json({contractID: `Contract ${contractID} does not exist`});
+
+        eventID = doc.data().eventID; 
+        if(doc.data().clientHandle !== userHandle && doc.data().serviceHandle !== userHandle)                           //Check that the person deleting contract is in the database 
+            return response.status(500).json({userHandle: `User ${userHandle} cannot delete contract ${contractID}`});
+        if(!doc.data().active)
+            return response.status(500).json({contract: `Contract ${contractID} already inactive`});
+        return db.doc(`/contracts/${contractID}`).update({active: false})
+    })
+    .then(() =>
+    {
+        db.doc(`/events/${eventID}`).get()
+        .then(doc =>
+        {
+            let eventDate = doc.data().eventDate                                        
+            if(new Date().toISOString() >= eventDate)                                                                   //Users cannot delete the contract after the event has occurred. 
+            {
+                db.doc(`/contracts/${contractID}`).update({active: true})
+                .then(() =>
+                {
+                    return response.status(500).json({contract: 'Contract cannot be deleted after the event date has occurred'});
+                })
+            }
+
+            let services = doc.data().services; 
+            services.forEach(serv =>
+            {
+                if(serv.service !== null || serv.service.contractID === contractID)
+                    serv.service = null; 
+            })
+            return db.doc(`/events/${eventID}`).update({services})
+        })
+        .then(() =>
+        {
+            return response.status(201).json({message: `Successfully deleted contract ${contractID}`});
+        })
+    })
+    .catch(err =>
+    {
+        return response.status(500).json(err); 
+    })
+}
