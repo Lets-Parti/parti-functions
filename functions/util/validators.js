@@ -49,6 +49,3 @@ exports.usernameLimit = (str) => {
 exports.nameOfUserLimit = (str) => {
     return str.length > 30;
 }
-// exports.serviceRequestLimit = (str) => {
-//     return str.length > 220;
-// }

@@ -83,8 +83,6 @@ exports.createEvent = (request, response) =>
         errors.title = 'Event title cannot exceed 60 characters'
     if(eventDescriptionLimit(newEvent.description))
         errors.description = 'Event description cannot exceed 500 characters'
-    // if(serviceRequestLimit(newEvent.services.description))
-    //     errors.services.description = 'Requested service description cannot exceed 220 characters'
     if(newEvent.services.length === 0)
         errors.serviceType = 'Must submit one or more services'
 
