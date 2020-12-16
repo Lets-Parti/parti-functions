@@ -400,7 +400,7 @@ Database:
 
 # `Contract` Route API's
 
-## POST: `/contract`
+## POST: `/contracts`
 
 ** Create a new contract **. The API requires a Bearer token of type 'service' (Only services can create contracts).
 Provide the client's handle, eventID, fees, tags (what service(s) are provided?), and contract body
@@ -426,7 +426,46 @@ Successful response:
 }
 ```
 
-## POST: `/contract/sign`
+## GET: `/contracts`
+
+** Get all contracts associated with the user **. The API requires a bearer token of a type 'service' or 'client'. It will query through the `/contracts` collection to find contracts that are associated with that person. It will also return the total cost of all fees in the contract.
+
+Sample response:
+
+```
+[
+    {
+        "tags": [
+            "DJ",
+            "Food Truck"
+        ],
+        "contractID": "PAzKOLBnrpcOMRoBFeLL",
+        "createdAt": "2020-12-15T22:57:30.613Z",
+        "serviceHandle": "808hertz",
+        "fees": [
+            {
+                "name": "DJ Services",
+                "cost": 800
+            },
+            {
+                "name": "Food Truck",
+                "cost": 325
+            }
+        ],
+        "signed": true,
+        "body": "We will provide a lot ",
+        "clientMemo": "",
+        "eventID": "eZYlRB3mXVZ2Hyz49gw0",
+        "eventDate": "2021-01-12T00:00:00",
+        "serviceMemo": "",
+        "clientHandle": "matt8p",
+        "active": false,
+        "totalCost": 1125
+    }
+]
+```
+
+## POST: `/contracts/sign`
 
 ** Sign a contract **. The API requires a Bearer token of type 'client'. (Only clients can sign a contract). The input is the contractID that is being approved.
 
@@ -438,7 +477,7 @@ Sample input:
 }
 ```
 
-## POST: `/contract/delete`
+## POST: `/contracts/delete`
 
 ** Delete a contract **. The API requires a Bearer token of any type. Only those whose handles are on the contract can delete the contract. Deleting the contract will set the contract's `active` field to false. It will then remove the contract from its placement in `events`
 

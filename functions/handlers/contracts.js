@@ -171,3 +171,61 @@ exports.deleteContract = (request, response) =>
         return response.status(500).json(err); 
     })
 }
+
+exports.getUserContracts = (request, response) =>
+{
+    const userHandle = request.user.userHandle; 
+    const type = request.user.type; 
+
+    if(type === 'client')
+    {
+        db.collection('contracts')
+        .where('clientHandle', '==', userHandle)
+        .get()
+        .then(data =>
+        {
+            let contracts = []
+            data.forEach(doc =>
+            {
+                let contract = doc.data(); 
+                let totalCost = 0; 
+                contract.fees.forEach(fee =>
+                {
+                    totalCost += fee.cost; 
+                })
+                contract.totalCost = totalCost; 
+                contracts.push(contract); 
+            })
+            return response.status(201).json(contracts); 
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    }else if(type === 'service')
+    {
+        db.collection('contracts')
+        .where('serviceHandle', '==', userHandle)
+        .get()
+        .then(data =>
+        {
+            let contracts = []
+            data.forEach(doc =>
+            {
+                let contract = doc.data(); 
+                let totalCost = 0; 
+                contract.fees.forEach(fee =>
+                {
+                    totalCost += fee.cost; 
+                })
+                contract.totalCost = totalCost; 
+                contracts.push(contract); 
+            })
+            return response.status(201).json(contracts); 
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    }
+}
