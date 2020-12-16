@@ -29,7 +29,7 @@ exports.createContract = (request, response) =>
     if(isEmpty(newContract.clientHandle))
         errors.clientHandle = 'Client Handle cannot be empty'
     if(newContract.fees.length == 0)
-        errors.fees = 'Must include at least fee'   
+        errors.fees = 'Must include at least 1 fee'   
     if(isEmpty(newContract.body))
         errors.contractBody = 'Contract body cannot be empty'
     if(isEmpty(newContract.eventID))
