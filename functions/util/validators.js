@@ -31,3 +31,24 @@ exports.getDigits = (str) => {
     str1 = str.match(/\d/g).join("");
     return str1.slice(0,3) + "-" + str1.slice(3,6) + "-" + str1.slice(6);
 }
+
+exports.bioExceedLimit = (str) => {
+    return str.length > 500;
+}
+
+exports.eventTitleLimit = (str) => {
+    return str.length > 60;
+}
+exports.eventDescriptionLimit = (str) => {
+    return str.length > 500;
+}
+
+exports.usernameLimit = (str) => {
+    return str.length > 17;
+}
+exports.nameOfUserLimit = (str) => {
+    return str.length > 30;
+}
+// exports.serviceRequestLimit = (str) => {
+//     return str.length > 220;
+// }

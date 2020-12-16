@@ -1,7 +1,7 @@
 const {admin, db} = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
-const {isEmail, isEmpty, isZipcode, containsSpecialCharacters, isPhone, getDigits} = require('../util/validators');
+const {isEmail, isEmpty, isZipcode, containsSpecialCharacters, isPhone, getDigits, bioExceedLimit, usernameLimit, nameOfUserLimit} = require('../util/validators');
 const { user, service } = require('firebase-functions/lib/providers/auth');
 
 //Image upload modules
@@ -51,6 +51,12 @@ exports.signup = (request, response) =>
         errors.confirmPassword = 'Passwords must match';
     if(!isPhone(newUser.phone))
         errors.phone = 'Invalid phone number. (10-digit number)'
+    if(bioExceedLimit(newUser.bio))
+        errors.bio = 'User bio cannot exceed 500 characters'
+    if(nameOfUserLimit(newUser.fullName))
+        errors.fullName = 'Full name cannot exceed 30 characters'
+    if(usernameLimit(newUser.userHandle))
+        errors.userHandle = 'Username cannot exceed 17 characters'
     
     if(Object.keys(errors).length > 0)
         return response.status(400).json(errors);
