@@ -1,5 +1,5 @@
 const {db} = require('../util/admin');
-const {isEmpty, isZipcode} = require('../util/validators');
+const {isEmpty, isZipcode, eventDescriptionLimit, serviceRequestLimit, eventTitleLimit} = require('../util/validators');
 
 exports.getUsersEvents = (request, response) =>
 {
@@ -79,6 +79,10 @@ exports.createEvent = (request, response) =>
         errors.eventDate = 'Event date must be some time in the future'
     if(isEmpty(newEvent.title))
         errors.title = 'Event name cannot be empty'
+        if(eventTitleLimit(newEvent.title))
+        errors.title = 'Event title cannot exceed 60 characters'
+    if(eventDescriptionLimit(newEvent.description))
+        errors.description = 'Event description cannot exceed 500 characters'
     if(newEvent.services.length === 0)
         errors.serviceType = 'Must submit one or more services'
 
