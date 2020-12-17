@@ -91,16 +91,17 @@ exports.getEventByID = (request, response) =>
             if(!doc.exists)
                 return response.status(500).json({error: `Event ${eventID} does not exist`});
 
-            let services = doc.data().services; 
+            let docData = doc.data(); 
+            let services = docData.services; 
             services.forEach(service =>
             {
-                if(service.service && service.service.userHandle !== userHandle)
+                if(service.service !== null && service.service.userHandle !== userHandle)
                 {
                     service.service.contractID = 'redacted'; 
                     service.service.userHandle = 'redacted'; 
                 }
             })
-            return response.status(201).json(doc.data());
+            return response.status(201).json(docData);
         })
         .catch(err =>
         {
