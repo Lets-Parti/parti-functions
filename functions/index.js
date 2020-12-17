@@ -6,6 +6,7 @@ const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser
 const { discoverServices, discoverEvents } = require('./handlers/discover');
 const { feedback } = require('./handlers/feedback');
 const { createContract, signContract } = require('./handlers/contracts');
+const { addReview } = require('./handlers/review');
 const FirebaseAuth = require('./util/fbAuth');
 
 const app = express()
@@ -30,6 +31,9 @@ app.post('/user/image', FirebaseAuth, uploadProfileImage);
 app.post('/user/services/media', FirebaseAuth, uploadMediaImages);
 app.post('/user/services/media/delete', FirebaseAuth, deleteMediaImage);
 
+// TODO: Aaric is working on this
+app.post('/review/', FirebaseAuth, addReview);
+
 // discover routes
 app.get('/discover', discoverServices); 
 app.get('/discover/events', FirebaseAuth, discoverEvents); 
@@ -40,6 +44,8 @@ app.post('/feedback', feedback);
 //contract routes 
 app.post('/contract', FirebaseAuth, createContract);
 app.post('/contract/sign', FirebaseAuth, signContract);
+
+
 
 exports.api = functions.https.onRequest(app)
 
