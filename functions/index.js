@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const express = require('express');
+const cors = require('cors')
 
 const { createEvent, getUsersEvents } = require('./handlers/events');
 const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage } = require('./handlers/users');
@@ -9,8 +10,6 @@ const { createContract, signContract, deleteContract, getUserContracts } = requi
 const FirebaseAuth = require('./util/fbAuth');
 
 const app = express()
-
-const cors = require('cors')
 app.use(cors());
 
 // events routes 
