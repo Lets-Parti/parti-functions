@@ -29,6 +29,7 @@ exports.getUsersEvents = (request, response) =>
                 data.forEach((doc) =>
                 {
                     let thisDocumentData = doc.data(); 
+                    thisDocumentData.eventID = null; // sets eventID to null to protect information
                     events.push(thisDocumentData); 
                 })
 
@@ -69,7 +70,7 @@ exports.createEvent = (request, response) =>
         createdAt: new Date().toISOString(), 
         eventDate: request.body.eventDate,
         zipcode: request.body.zipcode,
-        services: request.body.services
+        services: request.body.services,
     }
 
     let errors = {}
