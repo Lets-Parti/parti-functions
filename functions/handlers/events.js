@@ -29,7 +29,6 @@ exports.getUsersEvents = (request, response) =>
                 data.forEach((doc) =>
                 {
                     let thisDocumentData = doc.data(); 
-                    thisDocumentData.eventID = null; // sets eventID to null to protect information
                     events.push(thisDocumentData); 
                 })
 
