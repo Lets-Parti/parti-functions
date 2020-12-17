@@ -147,7 +147,7 @@ exports.deleteContract = (request, response) =>
         if(new Date().toISOString() > doc.data().eventDate)
             return response.status(500).json({contract: `Cannot delete contract after event has occurred`});
 
-        db.doc(`/contracts/${contractID}`).update({active: false})
+        db.doc(`/contracts/${contractID}`).update({active: false, deletedAt: new Date().toISOString()})
         .then(() =>
         {
             db.doc(`/events/${eventID}`).get()
