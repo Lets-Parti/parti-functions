@@ -81,7 +81,9 @@ let CloudFirestoreDB =
             eventID: `${eventID}`,            
             eventDate: '2020-11-28T22:07:14',                
             signed: false,           
-            active: true,                                      
+            signedAt: '2020-11-28T22:07:14',                                //Appears when the contract is signed 
+            active: true,          
+            deletedAt: '2020-11-28T22:07:14',                               //Appears when the contract is deleted                  
             fees: [
                 {
                     name: 'Service Fee',
