@@ -146,24 +146,37 @@ exports.deleteContract = (request, response) =>
             return response.status(500).json({contract: `Contract ${contractID} already inactive`});
         if(new Date().toISOString() > doc.data().eventDate)
             return response.status(500).json({contract: `Cannot delete contract after event has occurred`});
-        return db.doc(`/contracts/${contractID}`).update({active: false})
-    })
-    .then(() =>
-    {
-        db.doc(`/events/${eventID}`).get()
-        .then(doc =>
-        {
-            let services = doc.data().services; 
-            services.forEach(serv =>
-            {
-                if(serv.service !== null || serv.service.contractID === contractID)
-                    serv.service = null; 
-            })
-            return db.doc(`/events/${eventID}`).update({services})
-        })
+
+        db.doc(`/contracts/${contractID}`).update({active: false})
         .then(() =>
         {
-            return response.status(201).json({message: `Successfully deleted contract ${contractID}`});
+            db.doc(`/events/${eventID}`).get()
+            .then(doc =>
+            {
+                let services = doc.data().services; 
+                services.forEach(serv =>
+                {
+                    if(serv.service !== null && serv.service.contractID === contractID)
+                        serv.service = null; 
+                })
+                db.doc(`/events/${eventID}`).update({services})
+                .then(() =>
+                {
+                    return response.status(201).json({message: `Successfully deleted contract ${contractID}`});
+                })
+                .catch(err =>
+                {
+                    return response.status(500).json(err); 
+                })
+            })
+            .catch(err =>
+            {
+                return response.status(500).json(err); 
+            })
+        })
+        .catch(err =>
+        {
+            return response.status(500).json(err); 
         })
     })
     .catch(err =>
