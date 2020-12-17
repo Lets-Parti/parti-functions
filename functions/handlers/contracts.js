@@ -89,9 +89,14 @@ exports.signContract = (request, response) =>
     {
         if(!doc.exists)
             return response.status(500).json({contractID: 'Contract ID does not exist'});
-        eventID = doc.data().eventID; 
-        contractTags = doc.data().tags; 
-        serviceHandle = doc.data().serviceHandle; 
+        let contract = doc.data(); 
+
+        if(!contract.active)
+            return response.status(500).json({contract: `Cannot sign inactive contract`});
+
+        eventID = contract.eventID; 
+        contractTags = contract.tags; 
+        serviceHandle = contract.serviceHandle; 
         return db.doc(`/contracts/${contractID}`).update({signed: true, signedAt: new Date().toISOString()}); 
     })                                                               
     .then(() =>
