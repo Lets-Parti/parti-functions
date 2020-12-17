@@ -92,7 +92,7 @@ exports.signContract = (request, response) =>
         eventID = doc.data().eventID; 
         contractTags = doc.data().tags; 
         serviceHandle = doc.data().serviceHandle; 
-        return db.doc(`/contracts/${contractID}`).update({signed: true}); 
+        return db.doc(`/contracts/${contractID}`).update({signed: true, signedAt: new Date().toISOString()}); 
     })                                                               
     .then(() =>
     {
