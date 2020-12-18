@@ -250,8 +250,7 @@ Return structure:
         "zipcode": "85286",
         "services": [
             {
-                "vendorFound": false,
-                "service": {},
+                "service": null,
                 "serviceType": "Photographer",
                 "description": "I need a cool photographer"
             }
@@ -268,12 +267,33 @@ Return structure:
             {
                 "description": "I need a DJ for my party",
                 "serviceType": "DJ",
-                "vendorFound": false,
-                "service": {}
+                "service": null
             }
         ]
     }
 ]
+```
+
+## GET `/events/:eventID`
+
+** Get event information by eventID **. A Bearer token is required. If a service calls the API, the service names will be redacted. If a client calls the API, it will only return the event if the event belongs to the client.
+
+```
+    {
+        "eventID": "DCkKbWVxGDbO8sVCpfuZ",
+        "title": "Mom's Anniversary",
+        "description": "Mom's 20th!",
+        "createdAt": "2020-11-30T22:49:32.565Z",
+        "eventDate": "2021-01-12T00:00:00",
+        "zipcode": "85286",
+        "services": [
+            {
+                "service": null,
+                "serviceType": "Photographer",
+                "description": "I need a cool photographer"
+            }
+        ]
+    }
 ```
 
 ## GET: `/discover`
@@ -336,16 +356,14 @@ Example: 808Hertz's tags is `[Food Truck]`. This will scan for all events in the
         "createdAt": "2020-12-05T20:02:12.452Z",
         "services": [
             {
-                "vendorFound": false,
                 "serviceType": "DJ",
                 "description": "Must be familiar with bar mitzvahs",
-                "service": {}
+                "service": null
             },
             {
                 "serviceType": "Food Truck",
                 "description": "Food truck that can serve kosher food",
-                "vendorFound": false,
-                "service": {}
+                "service": null
             }
         ],
         "title": "Isaac's Bar Mitzvah",
