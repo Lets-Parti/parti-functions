@@ -506,3 +506,20 @@ Sample input:
     "contractID": "v5AFaMcYsIOGfjKdoJ0i"
 }
 ```
+
+# Betas API
+
+## POST: `/beta`
+
+** Create a beta signup ** Call the API to create a beta signup
+
+Sample Input:
+
+```
+{
+    "fullName": "Matthew Wang",
+    "email": "matt8p@gmail.com",
+    "phone": "4807412412",
+    "company": "808Hertz"
+}
+```
