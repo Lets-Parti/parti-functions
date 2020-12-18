@@ -99,5 +99,16 @@ let CloudFirestoreDB =
             serviceMemo: '',
             clientMemo: ''
         }
+    ],
+
+    betas: 
+    [
+        {
+            fullName: 'Joe Biden', 
+            email: 'joebiden@whitehouse.gov', 
+            phone: '4801724123', 
+            company: '808Hertz Entertainment', 
+            createdAt: '2020-11-28T22:07:14', 
+        }
     ]
 }
