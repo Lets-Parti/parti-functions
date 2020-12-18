@@ -55,14 +55,21 @@ exports.discoverEvents = (request, response) => {
         .then(data => {
             let services = [];
 
-            data.forEach(doc => {
+            data.forEach((doc) => {
                 let servicesRequested = []
-                doc.data().services.forEach(service => {
+                let eventData = doc.data();
+                delete eventData.eventID;
+
+                eventData.services.forEach(service => {
                     servicesRequested.push(service.serviceType);
+                    if (service.service) {
+                        service.service.userHandle = 'redacted'
+                        service.service.contractID = 'redacted'
+                    }
                 });
                 const filteredArray = tags.filter(value => servicesRequested.includes(value));
                 if (filteredArray.length > 0) {
-                    services.push(doc.data());
+                    services.push(eventData);
                 }
             })
             response.json(services);

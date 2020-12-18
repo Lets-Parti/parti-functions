@@ -29,7 +29,7 @@ exports.createContract = (request, response) =>
     if(isEmpty(newContract.clientHandle))
         errors.clientHandle = 'Client Handle cannot be empty'
     if(newContract.fees.length == 0)
-        errors.fees = 'Must include at least fee'   
+        errors.fees = 'Must include at least 1 fee'   
     if(isEmpty(newContract.body))
         errors.contractBody = 'Contract body cannot be empty'
     if(isEmpty(newContract.eventID))
@@ -40,16 +40,16 @@ exports.createContract = (request, response) =>
     if(Object.keys(errors).length > 0)
         return response.status(500).json(errors); 
     
-    let clientDBPath = `/users/${newContract.clientHandle}`;
+    let clientDBPath = `/events/${newContract.eventID}`;
     db.doc(clientDBPath).get()                              //Check if the clientHandle and eventID match up 
     .then(doc =>
     {
         if(!doc.exists)
-            return response.status(500).json({clientHandle: 'Client user handle does not exist'});
-        let clientEvents = doc.data().events; 
-        if(!clientEvents.includes(newContract.eventID))
-            return response.status(500).json({eventID: `Invalid event ID for user ${newContract.clientHandle}`}); 
+            return response.status(500).json({eventID: `Event ${newContract.eventID} does not exist`});
+        if(doc.data().userHandle !== newContract.clientHandle)
+            return response.status(500).json({clientHandle: `User ${newContract.clientHandle} does not have event ${newContract.eventID}`});
         
+        newContract.eventDate = doc.data().eventDate;       //Insert eventDate into the database. 
         let contractID; 
         db.collection('contracts').add(newContract)
         .then(doc =>
@@ -59,11 +59,11 @@ exports.createContract = (request, response) =>
         })
         .then(() =>
         {
-            return response.status(201).json({message: `Contract ${contractID} successfully created`});
+            //TODO: Send a notification to the client that a contract has been created. 
         })
         .then(() =>
-        {
-            //TODO: Send a notification to the client that a contract has been created. 
+        {            
+            return response.status(201).json({message: `Contract ${contractID} successfully created`});
         })
     })
     .catch(err =>
@@ -89,10 +89,15 @@ exports.signContract = (request, response) =>
     {
         if(!doc.exists)
             return response.status(500).json({contractID: 'Contract ID does not exist'});
-        eventID = doc.data().eventID; 
-        contractTags = doc.data().tags; 
-        serviceHandle = doc.data().serviceHandle; 
-        return db.doc(`/contracts/${contractID}`).update({signed: true}); 
+        let contract = doc.data(); 
+
+        if(!contract.active)
+            return response.status(500).json({contract: `Cannot sign inactive contract`});
+
+        eventID = contract.eventID; 
+        contractTags = contract.tags; 
+        serviceHandle = contract.serviceHandle; 
+        return db.doc(`/contracts/${contractID}`).update({signed: true, signedAt: new Date().toISOString()}); 
     })                                                               
     .then(() =>
     {
@@ -104,7 +109,6 @@ exports.signContract = (request, response) =>
             {
                 if(contractTags.includes(service.serviceType))
                 {
-                    service.vendorFound = true; 
                     service.service = {
                         "userHandle": serviceHandle, 
                         "contractID": contractID
@@ -128,3 +132,118 @@ exports.signContract = (request, response) =>
     })
 }
 
+exports.deleteContract = (request, response) =>
+{
+    const contractID = request.body.contractID; 
+    let userHandle = request.user.userHandle; 
+        
+    let eventID; 
+    db.doc(`/contracts/${contractID}`).get()
+    .then(doc =>
+    {
+        if(!doc.exists)
+            return response.status(500).json({contractID: `Contract ${contractID} does not exist`});
+
+        eventID = doc.data().eventID; 
+        if(doc.data().clientHandle !== userHandle && doc.data().serviceHandle !== userHandle)                           //Check that the person deleting contract is in the database 
+            return response.status(500).json({userHandle: `User ${userHandle} cannot delete contract ${contractID}`});
+        if(!doc.data().active)
+            return response.status(500).json({contract: `Contract ${contractID} already inactive`});
+        if(new Date().toISOString() > doc.data().eventDate)
+            return response.status(500).json({contract: `Cannot delete contract after event has occurred`});
+
+        db.doc(`/contracts/${contractID}`).update({active: false, deletedAt: new Date().toISOString()})
+        .then(() =>
+        {
+            db.doc(`/events/${eventID}`).get()
+            .then(doc =>
+            {
+                let services = doc.data().services; 
+                services.forEach(serv =>
+                {
+                    if(serv.service !== null && serv.service.contractID === contractID)
+                        serv.service = null; 
+                })
+                db.doc(`/events/${eventID}`).update({services})
+                .then(() =>
+                {
+                    return response.status(201).json({message: `Successfully deleted contract ${contractID}`});
+                })
+                .catch(err =>
+                {
+                    return response.status(500).json(err); 
+                })
+            })
+            .catch(err =>
+            {
+                return response.status(500).json(err); 
+            })
+        })
+        .catch(err =>
+        {
+            return response.status(500).json(err); 
+        })
+    })
+    .catch(err =>
+    {
+        return response.status(500).json(err); 
+    })
+}
+
+exports.getUserContracts = (request, response) =>
+{
+    const userHandle = request.user.userHandle; 
+    const type = request.user.type; 
+
+    if(type === 'client')
+    {
+        db.collection('contracts')
+        .where('clientHandle', '==', userHandle)
+        .get()
+        .then(data =>
+        {
+            let contracts = []
+            data.forEach(doc =>
+            {
+                let contract = doc.data(); 
+                let totalCost = 0; 
+                contract.fees.forEach(fee =>
+                {
+                    totalCost += fee.cost; 
+                })
+                contract.totalCost = totalCost; 
+                contracts.push(contract); 
+            })
+            return response.status(201).json(contracts); 
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    }else if(type === 'service')
+    {
+        db.collection('contracts')
+        .where('serviceHandle', '==', userHandle)
+        .get()
+        .then(data =>
+        {
+            let contracts = []
+            data.forEach(doc =>
+            {
+                let contract = doc.data(); 
+                let totalCost = 0; 
+                contract.fees.forEach(fee =>
+                {
+                    totalCost += fee.cost; 
+                })
+                contract.totalCost = totalCost; 
+                contracts.push(contract); 
+            })
+            return response.status(201).json(contracts); 
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    }
+}

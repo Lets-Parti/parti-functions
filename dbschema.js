@@ -78,9 +78,12 @@ let CloudFirestoreDB =
             contractID: 'xZFdfkl123DFASD',
             serviceHandle: `808hertz`,                                      //Who is providing the service? 
             clientHandle: 'matt8p',                                         //Who is the recipient of the service? 
-            eventID: `${eventID}`,                            
+            eventID: `${eventID}`,            
+            eventDate: '2020-11-28T22:07:14',                
             signed: false,           
-            active: true,                                      
+            signedAt: '2020-11-28T22:07:14',                                //Appears when the contract is signed 
+            active: true,          
+            deletedAt: '2020-11-28T22:07:14',                               //Appears when the contract is deleted                  
             fees: [
                 {
                     name: 'Service Fee',

@@ -1,5 +1,5 @@
 const {db} = require('../util/admin');
-const {isEmpty, isZipcode} = require('../util/validators');
+const {isEmpty, isZipcode, eventDescriptionLimit, serviceRequestLimit, eventTitleLimit} = require('../util/validators');
 
 exports.getUsersEvents = (request, response) =>
 {
@@ -29,7 +29,6 @@ exports.getUsersEvents = (request, response) =>
                 data.forEach((doc) =>
                 {
                     let thisDocumentData = doc.data(); 
-                    thisDocumentData.eventID = doc.id; 
                     events.push(thisDocumentData); 
                 })
 
@@ -56,6 +55,60 @@ exports.getUsersEvents = (request, response) =>
     })
 }
 
+exports.getEventByID = (request, response) =>
+{
+    const eventID = request.params.eventID; 
+    const userType = request.user.type; 
+    const userHandle = request.user.userHandle; 
+
+    if(userType === 'client')
+    {
+        db.doc(`/users/${userHandle}`).get()
+        .then(doc =>
+        {
+            let userEvents = doc.data().events; 
+            if(!userEvents.includes(eventID))
+                return response.status(500).json({event: `User ${userHandle} cannot access event ${eventID}`});
+            
+            db.doc(`/events/${eventID}`).get()
+            .then(doc =>
+            {
+                if(!doc.exists)
+                    return response.status(500).json({error: `Event ${eventID} does not exist`});
+                return response.status(201).json(doc.data()); 
+            })
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    }else if(userType === 'service')
+    {   
+        db.doc(`/events/${eventID}`).get()
+        .then(doc =>
+        {
+            if(!doc.exists)
+                return response.status(500).json({error: `Event ${eventID} does not exist`});
+
+            let docData = doc.data(); 
+            let services = docData.services; 
+            services.forEach(service =>
+            {
+                if(service.service !== null && service.service.userHandle !== userHandle)
+                {
+                    service.service.contractID = 'redacted'; 
+                    service.service.userHandle = 'redacted'; 
+                }
+            })
+            return response.status(201).json(docData);
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    }
+}
+
 exports.createEvent = (request, response) => 
 {
     if(request.user.type !== 'client')
@@ -70,7 +123,7 @@ exports.createEvent = (request, response) =>
         createdAt: new Date().toISOString(), 
         eventDate: request.body.eventDate,
         zipcode: request.body.zipcode,
-        services: request.body.services
+        services: request.body.services,
     }
 
     let errors = {}
@@ -80,15 +133,23 @@ exports.createEvent = (request, response) =>
         errors.eventDate = 'Event date must be some time in the future'
     if(isEmpty(newEvent.title))
         errors.title = 'Event name cannot be empty'
+        if(eventTitleLimit(newEvent.title))
+        errors.title = 'Event title cannot exceed 60 characters'
+    if(eventDescriptionLimit(newEvent.description))
+        errors.description = 'Event description cannot exceed 500 characters'
     if(newEvent.services.length === 0)
         errors.serviceType = 'Must submit one or more services'
 
+    let serviceTypes = []; 
     newEvent.services.forEach(service =>
     {
+        if(serviceTypes.includes(service.serviceType))
+            errors.serviceType = 'Cannot have duplicate services'
         if(!service.serviceType || service.serviceType === null || isEmpty(service.serviceType))
         {
-            errors.serviceType = 'One or more services missing'
+            errors.serviceType = 'Cannot leave service empty'
         }
+        serviceTypes.push(service.serviceType); 
     })
     
     if(Object.keys(errors).length > 0)
