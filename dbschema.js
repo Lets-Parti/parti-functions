@@ -83,4 +83,17 @@ let CloudFirestoreDB =
             }
         }
     ]
+
+    messages: [
+        {
+            sender: `${userHandle}`,
+            sendee: "matt8p",
+            sentAt: '2020-11-28T22:07:14',
+            subject: "First contact",
+            body: 'Will DJ at the event from 8Am to 9pm ',
+            service: {
+                userHandle: `${userHandle}`
+            }
+        
+    ]
 }

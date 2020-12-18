@@ -388,3 +388,20 @@ Database:
     }
 ]
 ```
+
+## POST: `/connect`
+
+To send feedback about your experience using the Parti app, use the `/feedback` API
+
+contains service requested or needed in header (since companies and events have multiple services)
+
+Example Body:
+
+```
+{
+    "eventID": "FwXDGvSSY1TSrlT4DCsP",
+    "sendeeHandle": 'matt8p',
+    "body": "Hi I would like to offer my services as a DJ for your event on 12/25/2020"
+}
+```
+

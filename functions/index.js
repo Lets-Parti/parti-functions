@@ -4,6 +4,7 @@ const express = require('express');
 const { createEvent, getUsersEvents } = require('./handlers/events');
 const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage } = require('./handlers/users');
 const { discoverServices, discoverEvents } = require('./handlers/discover');
+const { connect } = require('./handlers/connect');
 const { feedback } = require('./handlers/feedback');
 const FirebaseAuth = require('./util/fbAuth');
 
@@ -34,6 +35,9 @@ app.get('/discover/events', FirebaseAuth, discoverEvents);
 
 //feedback routes
 app.post('/feedback', feedback);
+
+// connect routes
+app.post('/connect', FirebaseAuth, connect);
 
 exports.api = functions.https.onRequest(app)
 
