@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "lets-parti"
+    "default": "lets-parti",
+    "parti-production": "parti-production"
   }
 }

@@ -210,7 +210,7 @@ exports.getUserByHandle = (request, response) =>
         return response.status(500).json({error: 'User handle cannot be empty'});
     }
 
-    const dbPath = `/users/${userHandle}`;
+    const dbPath = `/users/${userHandle}`; 
 
     db.doc(dbPath).get()
     .then(doc =>
