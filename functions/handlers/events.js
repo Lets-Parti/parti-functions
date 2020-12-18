@@ -55,6 +55,60 @@ exports.getUsersEvents = (request, response) =>
     })
 }
 
+exports.getEventByID = (request, response) =>
+{
+    const eventID = request.params.eventID; 
+    const userType = request.user.type; 
+    const userHandle = request.user.userHandle; 
+
+    if(userType === 'client')
+    {
+        db.doc(`/users/${userHandle}`).get()
+        .then(doc =>
+        {
+            let userEvents = doc.data().events; 
+            if(!userEvents.includes(eventID))
+                return response.status(500).json({event: `User ${userHandle} cannot access event ${eventID}`});
+            
+            db.doc(`/events/${eventID}`).get()
+            .then(doc =>
+            {
+                if(!doc.exists)
+                    return response.status(500).json({error: `Event ${eventID} does not exist`});
+                return response.status(201).json(doc.data()); 
+            })
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    }else if(userType === 'service')
+    {   
+        db.doc(`/events/${eventID}`).get()
+        .then(doc =>
+        {
+            if(!doc.exists)
+                return response.status(500).json({error: `Event ${eventID} does not exist`});
+
+            let docData = doc.data(); 
+            let services = docData.services; 
+            services.forEach(service =>
+            {
+                if(service.service !== null && service.service.userHandle !== userHandle)
+                {
+                    service.service.contractID = 'redacted'; 
+                    service.service.userHandle = 'redacted'; 
+                }
+            })
+            return response.status(201).json(docData);
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    }
+}
+
 exports.createEvent = (request, response) => 
 {
     if(request.user.type !== 'client')
