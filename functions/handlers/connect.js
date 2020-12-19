@@ -58,7 +58,10 @@ exports.createConnect = (request, response) =>
                                    <p>${connect_data.body}</p>
                                    <p>Here's my contact information: </p>
                                    <p>${phone}</p>
-                                   <p>${emailFrom}</p>`;
+                                   <p>${emailFrom}</p>
+                                   <br>
+                                   <i>We hope you're having a good experience. Create your event or view your contracts at Parti!</i>`
+                                   ;
 
                 cors(request, response, () => 
                 {
