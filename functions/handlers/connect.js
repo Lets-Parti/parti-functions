@@ -56,7 +56,6 @@ exports.createConnect = (request, response) =>
                                    <br>
                                    <b>${fullName} reached out to you!<b>. <br><br>
                                    <p>${connect_data.body}</p>
-                                   <br>
                                    <p>Here's my contact information: </p>
                                    <p>${phone}</p>
                                    <p>${emailFrom}</p>`;
