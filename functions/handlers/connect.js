@@ -29,12 +29,10 @@ exports.createConnect = (request, response) =>
 
     if(userType === 'client')
     {
-        connect_data.accept = true;
         connect_data.clientHandle = from;
         connect_data.serviceHandle = to;
     }else if(userType === 'service')
     {
-        connect_data.accept = false;
         connect_data.clientHandle = to;
         connect_data.serviceHandle = from;
     }
@@ -54,7 +52,14 @@ exports.createConnect = (request, response) =>
             .then(doc =>
             {
                 let emailTo = doc.data().email; 
-                const emailBody = `${fullName} wants to reach out to you. Here is the contact info: ${phone} ${emailFrom}. Here is the message Body: ${connect_data.body}`;
+                const emailBody = `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/logo_beta.png?alt=media&token=ff77edb3-aafb-4d66-8f6e-b462f5d821f0" style="height: 100px;" alt="partilogo"></img>
+                                   <br>
+                                   <b>${fullName} reached out to you!<b>. <br><br>
+                                   <p>${connect_data.body}</p>
+                                   <br>
+                                   <p>Here's my contact information: </p>
+                                   <p>${phone}</p>
+                                   <p>${emailFrom}</p>`;
 
                 cors(request, response, () => 
                 {
@@ -62,7 +67,7 @@ exports.createConnect = (request, response) =>
                     {
                         from: 'Parti <funpartiapp@gmail.com>', 
                         to: emailTo,
-                        subject: 'I\'M A PICKLE!!!', 
+                        subject: `${fullName} Reached Out`, 
                         html: emailBody
                     }
                     return transporter.sendMail(mailOptions, (erro, info) => 
