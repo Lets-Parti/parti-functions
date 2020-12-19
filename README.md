@@ -517,7 +517,7 @@ Sample Input
 ```
 {
     "body": "Hello!",
-    "userHandle": "matt8p"
+    "userHandle": "matt8p"  (Whoever you're sending the connect to)
 }
 
 # Betas API
