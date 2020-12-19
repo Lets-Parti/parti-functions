@@ -507,6 +507,19 @@ Sample input:
 }
 ```
 
+# Connect API
+
+## POST: `/connect`
+
+** Create a connect with a user **
+Sample Input
+
+```
+{
+    "body": "Hello!",
+    "userHandle": "matt8p"
+}
+
 # Betas API
 
 ## POST: `/beta`
@@ -516,10 +529,14 @@ Sample input:
 Sample Input:
 
 ```
+
 {
-    "fullName": "Matthew Wang",
-    "email": "matt8p@gmail.com",
-    "phone": "4807412412",
-    "company": "808Hertz"
+"fullName": "Matthew Wang",
+"email": "matt8p@gmail.com",
+"phone": "4807412412",
+"company": "808Hertz"
 }
+
+```
+
 ```
