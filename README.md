@@ -399,7 +399,6 @@ Example Body:
 
 ```
 {
-    "eventID": "FwXDGvSSY1TSrlT4DCsP",
     "sendeeHandle": 'matt8p',
     "body": "Hi I would like to offer my services as a DJ for your event on 12/25/2020"
 }
