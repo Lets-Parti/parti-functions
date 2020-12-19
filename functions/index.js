@@ -51,7 +51,5 @@ app.post('/contracts/delete', FirebaseAuth, deleteContract);
 //beta routes
 app.post('/beta', createBeta);
 
-
-
 exports.api = functions.https.onRequest(app)
 
