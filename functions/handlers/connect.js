@@ -54,7 +54,7 @@ exports.createConnect = (request, response) =>
                 let emailTo = doc.data().email; 
                 const emailBody = `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/logo_beta.png?alt=media&token=ff77edb3-aafb-4d66-8f6e-b462f5d821f0" style="height: 100px;" alt="partilogo"></img>
                                    <br>
-                                   <b>${fullName} reached out to you!<b>. <br><br>
+                                   <b>${fullName} (@${from})reached out to you!<b>. <br><br>
                                    <p>${connect_data.body}</p>
                                    <p>Here's my contact information: </p>
                                    <p>${phone}</p>
