@@ -6,6 +6,7 @@ let CloudFirestoreDB =
         {
             userID: 'biEX5dBoj4eAPpTn1LCsB3iDQE13',
             email: 'matt@gmail.com',
+            phone: '4809112312',
             userHandle: 'matt8p',
             fullName: 'Matthew Wang',
             type: 'client',                                                //Either a client or service account 
@@ -17,6 +18,7 @@ let CloudFirestoreDB =
         {
             userID: 'biEX5dBoj4eAPpTn1LCsB3iDQE13',
             email: '808hertz@gmail.com',
+            phone: '4809112312',
             userHandle: 'matt8p',
             fullName: '808Hertz Entertainment',
             type: 'service',                                                //Either a client or service account 
@@ -49,7 +51,7 @@ let CloudFirestoreDB =
             eventDate: '2020-12-31T00:00:00',
             zipcode: '85286',
             userHandle: 'matt8p',
-
+            eventID: 'Cychzixfpqyu6gOrRBrw',
             services: [
                 {
                     serviceType: 'DJ',
@@ -72,15 +74,41 @@ let CloudFirestoreDB =
 
     contracts: [
         {
-            userHandle: `${userHandle}`,
             createdAt: '2020-11-28T22:07:14',
-            event: `${eventID}`,
-            approved: false,
-            price: 500,
-            details: 'Will DJ at the event from 8Am to 9pm ',
-            service: {
-                userHandle: `${userHandle}`
-            }
+            contractID: 'xZFdfkl123DFASD',
+            serviceHandle: `808hertz`,                                      //Who is providing the service? 
+            clientHandle: 'matt8p',                                         //Who is the recipient of the service? 
+            eventID: `${eventID}`,            
+            eventDate: '2020-11-28T22:07:14',                
+            signed: false,           
+            signedAt: '2020-11-28T22:07:14',                                //Appears when the contract is signed 
+            active: true,          
+            deletedAt: '2020-11-28T22:07:14',                               //Appears when the contract is deleted                  
+            fees: [
+                {
+                    name: 'Service Fee',
+                    price: 50
+                }, 
+                {
+                    name: 'DJ Package',
+                    price: 800
+                }
+            ],  
+            tags: [],                                                       //What services is the provider providing? 
+            body: 'We will provide lighting and sound to the event',
+            serviceMemo: '',
+            clientMemo: ''
+        }
+    ],
+
+    betas: 
+    [
+        {
+            fullName: 'Joe Biden', 
+            email: 'joebiden@whitehouse.gov', 
+            phone: '4801724123', 
+            company: '808Hertz Entertainment', 
+            createdAt: '2020-11-28T22:07:14', 
         }
     ]
 }
