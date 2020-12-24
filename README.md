@@ -189,7 +189,10 @@ Sample body for service:
     "fullName": "Cool Entertainment LLC",
     "phone": "1234567899",
     "tags": ["DJ", "Photography"],
-    "bio": "Best company"
+    "bio": "Best company",
+    "website": "www.google.com",
+    "instagram": "www.instagram.com",
+    "facebook": "www.facebook.com"
 }
 ```
 
