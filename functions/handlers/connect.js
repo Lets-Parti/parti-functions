@@ -48,6 +48,9 @@ exports.createConnect = (request, response) =>
             let phone = doc.data().phone; 
             let fullName = doc.data().fullName; 
             
+            let link = `https://www.parti.app/user/${from}`;
+            let htmlLink = <a href={link}>See the service's page here</a>;
+            
             db.doc(`/users/${to}`).get()
             .then(doc =>
             {
