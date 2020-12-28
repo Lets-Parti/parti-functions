@@ -127,9 +127,9 @@ exports.getConnects = (request, response) =>
         {
             let dbPath = `/users/${user}`;
             usersData.push({CurrentUser: `${dbPath}`});
-            /*
+            
             db.collection('users')
-            .where(`${userHandle}`, '==',`${user}`)
+            .doc(`${user}`)
             .get()
             .then(doc => 
             {
@@ -147,9 +147,9 @@ exports.getConnects = (request, response) =>
             .catch(err => {
                 return response.status(500).json({ error: `Error: Unable to retrieve user data` });
             })
-            */
+            
             usersData.push({PushedData: "6"});
-            usersData.push(db.doc(dbPath).get().data().userHandle);
+            //usersData.push(db.doc(dbPath).get().data().userHandle);
         })
         response.json(usersData);
     })
