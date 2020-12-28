@@ -5,6 +5,7 @@ const { isEmail, isEmpty, isZipcode, containsSpecialCharacters } = require('../u
 const axios = require('axios');
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
+const { user } = require('firebase-functions/lib/providers/auth');
 
 exports.createConnect = (request, response) => 
 {
@@ -47,10 +48,12 @@ exports.createConnect = (request, response) =>
             let emailFrom = doc.data().email; 
             let phone = doc.data().phone; 
             let fullName = doc.data().fullName; 
-            
+
+            /*
             let link = `https://www.parti.app/user/${from}`;
-            let htmlLink = <a href={link}>See the service's page here</a>;
-            
+            let htmlLink = `<a href=${link}>See the service's page here</a>`;
+            */
+
             db.doc(`/users/${to}`).get()
             .then(doc =>
             {
@@ -94,5 +97,63 @@ exports.createConnect = (request, response) =>
         {
             return response.status(500).json({err}); 
         })
+    })
+}
+
+//.where(`${whichHandle}`, '==', `${userHandle}`)
+
+exports.getConnects = (request, response) => 
+{
+    const userHandle = request.user.userHandle;
+    let isClient = request.user.type === 'client';
+    let whichHandle = isClient ? 'clientHandle' : 'serviceHandle';
+    let otherHandle = !isClient ? 'clientHandle' : 'serviceHandle';
+    db.collection('connects')
+    .where(`${whichHandle}`, '==', `${userHandle}`)
+    .get()
+    .then(data => {
+        let connectedUsers = [];
+        data.forEach(doc =>
+        {
+            connectHandle = isClient ? doc.data().serviceHandle : doc.data().clientHandle;
+            if (connectedUsers.indexOf(connectHandle) == -1){
+                connectedUsers.push(connectHandle);
+            }
+        })
+        let usersData = [{TestMessage: "Hello"}];
+        usersData.push({Data: "4"});
+        
+        connectedUsers.forEach(user =>
+        {
+            let dbPath = `/users/${user}`;
+            usersData.push({CurrentUser: `${dbPath}`});
+            /*
+            db.collection('users')
+            .where(`${userHandle}`, '==',`${user}`)
+            .get()
+            .then(doc => 
+            {
+                usersData.push({PushedData: "5"});
+                if(!doc.exists)
+                {
+                    return response.status(500).json({error: `Database path ${dbPath} does not exist `});
+                }
+                else
+                {
+                    usersData.push({PushedData: "6"});
+                    //usersData.push(doc.data());
+                }
+            })
+            .catch(err => {
+                return response.status(500).json({ error: `Error: Unable to retrieve user data` });
+            })
+            */
+            usersData.push({PushedData: "6"});
+            usersData.push(db.doc(dbPath).get().data().userHandle);
+        })
+        response.json(usersData);
+    })
+    .catch(err => {
+        return response.status(500).json({ error: `Error: ${err.code}` });
     })
 }
