@@ -6,9 +6,9 @@ const axios = require('axios');
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
 const { user } = require('firebase-functions/lib/providers/auth');
+const parti_development = require('../util/config');
 
-exports.createConnect = (request, response) => 
-{
+exports.createConnect = (request, response) => {
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -17,10 +17,10 @@ exports.createConnect = (request, response) =>
         }
     })
 
-    const userType = request.user.type;     
-    const from = request.user.userHandle;                                     //Person sending the message
+    const userType = request.user.type;
+    const from = request.user.userHandle;
     const body = request.body.body;
-    const to = request.body.userHandle; 
+    const to = request.body.userHandle;
 
     let connect_data =
     {
@@ -28,132 +28,96 @@ exports.createConnect = (request, response) =>
         body: body
     }
 
-    if(userType === 'client')
-    {
+    if (userType === 'client') {
         connect_data.clientHandle = from;
         connect_data.serviceHandle = to;
-    }else if(userType === 'service')
-    {
+    } else if (userType === 'service') {
         connect_data.clientHandle = to;
         connect_data.serviceHandle = from;
     }
 
     db.collection('connects')
-    .add(connect_data)
-    .then((doc) => 
-    {
-        db.doc(`/users/${from}`).get()
-        .then(doc =>
-        {
-            let emailFrom = doc.data().email; 
-            let phone = doc.data().phone; 
-            let fullName = doc.data().fullName; 
+        .add(connect_data)
+        .then((doc) => {
+            db.doc(`/users/${from}`).get()
+                .then(doc => {
+                    let emailFrom = doc.data().email;
+                    let phone = doc.data().phone;
+                    let fullName = doc.data().fullName;
 
-            /*
-            let link = `https://www.parti.app/user/${from}`;
-            let htmlLink = `<a href=${link}>See the service's page here</a>`;
-            */
+                    let emailBody;
 
-            db.doc(`/users/${to}`).get()
-            .then(doc =>
-            {
-                let emailTo = doc.data().email; 
-                const emailBody = `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/logo_beta.png?alt=media&token=ff77edb3-aafb-4d66-8f6e-b462f5d821f0" style="height: 100px;" alt="partilogo"></img>
-                                   <br>
-                                   <b>${fullName} (@${from})reached out to you!<b>. <br><br>
-                                   <p>${connect_data.body}</p>
-                                   <p>Here's my contact information: </p>
-                                   <p>${phone}</p>
-                                   <p>${emailFrom}</p>
-                                   <br>
-                                   <i>We hope you're having a good experience. Create your event or view your contracts at Parti!</i>`
-                                   ;
-
-                cors(request, response, () => 
-                {
-                    const mailOptions = 
-                    {
-                        from: 'Parti <funpartiapp@gmail.com>', 
-                        to: emailTo,
-                        subject: `${fullName} Reached Out`, 
-                        html: emailBody
+                    if (userType === 'client') {
+                        emailBody =
+                            `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/logo_beta.png?alt=media&token=ff77edb3-aafb-4d66-8f6e-b462f5d821f0" style="height: 100px;" alt="partilogo"></img>
+                        <br>
+                        <b>${fullName} (@${from})reached out to you!<b>. <br><br>
+                        <p>${connect_data.body}</p>
+                        <p>Here's my contact information: </p>
+                        <p>${phone}</p>
+                        <p>${emailFrom}</p>
+                        <br>
+                        <i>We hope you're having a good experience. Create your event or view your contracts at Parti!</i>`;
+                    } else if (userType === 'service') {
+                        emailBody =
+                            `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/logo_beta.png?alt=media&token=ff77edb3-aafb-4d66-8f6e-b462f5d821f0" style="height: 100px;" alt="partilogo"></img>
+                        <br>
+                        <b>${fullName} (@${from})reached out to you!<b>. <br><br>
+                        <p>${connect_data.body}</p>
+                        <p>Here's my contact information: </p>
+                        <p>${phone}</p>
+                        <p>${emailFrom}</p>
+                        <a href="https://parti.app/users/${from}">Click here to view @${from}'s profile</a>
+                        <br>
+                        <i>We hope you're having a good experience. Create your event or view your contracts at Parti!</i>`;
                     }
-                    return transporter.sendMail(mailOptions, (erro, info) => 
-                    {
-                        if (erro) 
-                        {
-                            return response.send(erro.toString());
-                        }
-                        return response.status(201).json({message: "Connect Sent!"});
-                    });
+
+                    db.doc(`/users/${to}`).get()
+                        .then(doc => {
+                            let emailTo = doc.data().email;
+
+                            cors(request, response, () => {
+                                const mailOptions =
+                                {
+                                    from: 'Parti <funpartiapp@gmail.com>',
+                                    to: emailTo,
+                                    subject: `${fullName} Reached Out`,
+                                    html: emailBody
+                                }
+                                return transporter.sendMail(mailOptions, (erro, info) => {
+                                    if (erro) {
+                                        return response.send(erro.toString());
+                                    }
+                                    return response.status(201).json({ message: "Connect Sent!" });
+                                });
+                            })
+                        })
+                        .catch(err => {
+                            return response.status(500).json({ err });
+                        })
                 })
-            })
-            .catch(err =>
-            {
-                return response.status(500).json({err}); 
-            })
+                .catch(err => {
+                    return response.status(500).json({ err });
+                })
         })
-        .catch(err =>
-        {
-            return response.status(500).json({err}); 
-        })
-    })
 }
 
-//.where(`${whichHandle}`, '==', `${userHandle}`)
-
-exports.getConnects = (request, response) => 
-{
+exports.getConnects = (request, response) => {
     const userHandle = request.user.userHandle;
     let isClient = request.user.type === 'client';
     let whichHandle = isClient ? 'clientHandle' : 'serviceHandle';
     let otherHandle = !isClient ? 'clientHandle' : 'serviceHandle';
     db.collection('connects')
-    .where(`${whichHandle}`, '==', `${userHandle}`)
-    .get()
-    .then(data => {
-        let connectedUsers = [];
-        data.forEach(doc =>
-        {
-            connectHandle = isClient ? doc.data().serviceHandle : doc.data().clientHandle;
-            if (connectedUsers.indexOf(connectHandle) == -1){
-                connectedUsers.push(connectHandle);
-            }
-        })
-        let usersData = [{TestMessage: "Hello"}];
-        usersData.push({Data: "4"});
-        
-        connectedUsers.forEach(user =>
-        {
-            let dbPath = `/users/${user}`;
-            usersData.push({CurrentUser: `${dbPath}`});
-            
-            db.collection('users')
-            .doc(`${user}`)
-            .get()
-            .then(doc => 
-            {
-                usersData.push({PushedData: "5"});
-                if(!doc.exists)
-                {
-                    return response.status(500).json({error: `Database path ${dbPath} does not exist `});
-                }
-                else
-                {
-                    usersData.push({PushedData: "6"});
-                    //usersData.push(doc.data());
-                }
+        .where(`${whichHandle}`, '==', `${userHandle}`)
+        .get()
+        .then(data => {
+            let connects = [];
+            data.forEach(doc => {
+                connects.push(doc.data());
             })
-            .catch(err => {
-                return response.status(500).json({ error: `Error: Unable to retrieve user data` });
-            })
-            
-            usersData.push({PushedData: "6"});
-            //usersData.push(db.doc(dbPath).get().data().userHandle);
+            return response.status(201).json(connects);
         })
-        response.json(usersData);
-    })
-    .catch(err => {
-        return response.status(500).json({ error: `Error: ${err.code}` });
-    })
+        .catch(err => {
+            return response.status(500).json({ error: `Error: ${err.code}` });
+        })
 }
