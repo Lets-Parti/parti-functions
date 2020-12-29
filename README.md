@@ -302,7 +302,7 @@ Return structure:
 ## GET: `/discover`
 
 To retrieve a list of services nearby, use the `/discover` API
-This GET request requires a header with key `service`. It will then return a list of services that contain the tags that the user inputs. If no tags are entered, then the search displays all services. The search query gets narrower with the tags intersection as more tags are inputted by the user. The array is formed by comma separation.
+This GET request requires a header with key `service` and key `limit` (for pagination). It will then return a list of services that contain the tags that the user inputs. If no tags are entered, then the search displays all services. The search query gets narrower with the tags intersection as more tags are inputted by the user. The array is formed by comma separation.
 
 Example: service: "DJ, Food Truck"
 

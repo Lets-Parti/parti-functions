@@ -5,12 +5,17 @@ const { isEmail, isEmpty, isZipcode, containsSpecialCharacters } = require('../u
 const axios = require('axios');
 
 exports.discoverServices = (request, response) => {
-    let service = request.headers.service;
-    let tagArray = service.split(',');
+    const service = request.headers.service;
+    const limit = parseInt(request.headers.limit); 
+    const tagArray = service.split(',');
+
+    if(!limit)
+        return response.status(500).json({error: 'Limit cannot be empty'});
 
     if (service.length > 0) {
         db.collection('users')
             .where('type', '==', 'service')
+            .limit(limit)
             .get()
             .then(data => {
                 let services = [];
@@ -28,6 +33,7 @@ exports.discoverServices = (request, response) => {
     } else {
         db.collection('users')
             .where('type', '==', 'service')
+            .limit(limit)
             .get()
             .then(data => {
                 let services = [];
@@ -45,7 +51,7 @@ exports.discoverServices = (request, response) => {
 exports.discoverEvents = (request, response) => {
     if (request.user.type !== 'service')
         return response.status(500).json({ error: 'Must be of type service to get events' });
-
+    
     const tags = request.user.tags;
     const today = new Date().toISOString();
 
