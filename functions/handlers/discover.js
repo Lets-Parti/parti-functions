@@ -1,6 +1,7 @@
 const { admin, db } = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
+const staticData = require('../util/static-data')
 const { isEmail, isEmpty, isZipcode, containsSpecialCharacters } = require('../util/validators');
 const axios = require('axios');
 
@@ -14,7 +15,7 @@ exports.discoverServices = (request, response) => {
     if(page <= 0)
         return response.status(500).json({error: 'Page must be greater than 0'}); 
 
-    const limit = page === 1 ? 1 : 2 * (page - 1);
+    const limit = page === 1 ? 1 : staticData.SERVICES_PER_PAGE * (page - 1);
 
     if (service.length > 0) {
         db.collection('users')
@@ -26,7 +27,7 @@ exports.discoverServices = (request, response) => {
                 db.collection("users")
                     .where('type', '==', 'service')
                     .startAt(lastVisible)
-                    .limit(2)
+                    .limit(staticData.SERVICES_PER_PAGE + 1)
                     .get()
                     .then(data =>
                     {
@@ -37,6 +38,12 @@ exports.discoverServices = (request, response) => {
                             if (tagArray.length === filteredArray.length)
                                 services.push(doc.data());
                         })
+                        if(page === 1){
+                            services.pop();
+                        }else{
+                            services.shift(); 
+                        }
+
                         return response.status(201).json(services);
                     })
                 .catch(err =>
@@ -57,7 +64,7 @@ exports.discoverServices = (request, response) => {
                 db.collection("users")
                     .where('type', '==', 'service')
                     .startAt(lastVisible)
-                    .limit(2)
+                    .limit(staticData.SERVICES_PER_PAGE + 1)
                     .get()
                     .then(data =>
                     {
@@ -66,6 +73,11 @@ exports.discoverServices = (request, response) => {
                         {
                             services.push(doc.data());
                         })
+                        if(page === 1){
+                            services.pop();
+                        }else{
+                            services.shift(); 
+                        }
                         return response.status(201).json(services);
                     })
                 .catch(err =>
