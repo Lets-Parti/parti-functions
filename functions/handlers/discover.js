@@ -1,31 +1,55 @@
 const { admin, db } = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
+const staticData = require('../util/static-data')
 const { isEmail, isEmpty, isZipcode, containsSpecialCharacters } = require('../util/validators');
 const axios = require('axios');
 
 exports.discoverServices = (request, response) => {
     const service = request.headers.service;
-    const limit = parseInt(request.headers.limit); 
+    const page = parseInt(request.headers.page); 
     const tagArray = service.split(',');
 
-    if(!limit)
-        return response.status(500).json({error: 'Limit cannot be empty'});
+    if(page === null)
+        return response.status(500).json({error: 'Must specify page in the header'});
+    if(page <= 0)
+        return response.status(500).json({error: 'Page must be greater than 0'}); 
+
+    const limit = page === 1 ? 1 : staticData.SERVICES_PER_PAGE * (page - 1);
 
     if (service.length > 0) {
         db.collection('users')
             .where('type', '==', 'service')
             .limit(limit)
             .get()
-            .then(data => {
-                let services = [];
-                data.forEach(doc => {
-                    let serviceTags = doc.data().tags;
-                    const filteredArray = tagArray.filter(value => serviceTags.includes(value));
-                    if (tagArray.length === filteredArray.length)
-                        services.push(doc.data());
+            .then(documentSnapshots => {
+                var lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
+                db.collection("users")
+                    .where('type', '==', 'service')
+                    .startAt(lastVisible)
+                    .limit(staticData.SERVICES_PER_PAGE + 1)
+                    .get()
+                    .then(data =>
+                    {
+                        let services = [];
+                        data.forEach(doc => {
+                            let serviceTags = doc.data().tags;
+                            const filteredArray = tagArray.filter(value => serviceTags.includes(value));
+                            if (tagArray.length === filteredArray.length)
+                                services.push(doc.data());
+                        })
+                        if(page === 1){
+                            services.pop();
+                        }else{
+                            services.shift(); 
+                        }
+
+                        return response.status(201).json(services);
+                    })
+                .catch(err =>
+                {
+                    return response.status(500).json({ error: `Error: ${err.code}` });
                 })
-                response.json(services);
             })
             .catch(err => {
                 return response.status(500).json({ error: `Error: ${err.code}` });
@@ -35,12 +59,31 @@ exports.discoverServices = (request, response) => {
             .where('type', '==', 'service')
             .limit(limit)
             .get()
-            .then(data => {
-                let services = [];
-                data.forEach(doc => {
-                    services.push(doc.data());
+            .then(documentSnapshots => {
+                var lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
+                db.collection("users")
+                    .where('type', '==', 'service')
+                    .startAt(lastVisible)
+                    .limit(staticData.SERVICES_PER_PAGE + 1)
+                    .get()
+                    .then(data =>
+                    {
+                        let services = [];
+                        data.forEach(doc => 
+                        {
+                            services.push(doc.data());
+                        })
+                        if(page === 1){
+                            services.pop();
+                        }else{
+                            services.shift(); 
+                        }
+                        return response.status(201).json(services);
+                    })
+                .catch(err =>
+                {
+                    return response.status(500).json({ error: `Error: ${err.code}` });
                 })
-                response.json(services);
             })
             .catch(err => {
                 return response.status(500).json({ error: `Error: ${err.code}` });
