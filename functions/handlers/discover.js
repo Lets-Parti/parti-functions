@@ -15,41 +15,21 @@ exports.discoverServices = (request, response) => {
     if(page <= 0)
         return response.status(500).json({error: 'Page must be greater than 0'}); 
 
-    const limit = page === 1 ? 1 : staticData.SERVICES_PER_PAGE * (page - 1);
+    const limit = staticData.SERVICES_PER_PAGE;
 
     if (service.length > 0) {
         db.collection('users')
             .where('type', '==', 'service')
-            .limit(limit)
             .get()
-            .then(documentSnapshots => {
-                var lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
-                db.collection("users")
-                    .where('type', '==', 'service')
-                    .startAt(lastVisible)
-                    .limit(staticData.SERVICES_PER_PAGE + 1)
-                    .get()
-                    .then(data =>
-                    {
-                        let services = [];
-                        data.forEach(doc => {
-                            let serviceTags = doc.data().tags;
-                            const filteredArray = tagArray.filter(value => serviceTags.includes(value));
-                            if (tagArray.length === filteredArray.length)
-                                services.push(doc.data());
-                        })
-                        if(page === 1){
-                            services.pop();
-                        }else{
-                            services.shift(); 
-                        }
-
-                        return response.status(201).json(services);
-                    })
-                .catch(err =>
-                {
-                    return response.status(500).json({ error: `Error: ${err.code}` });
+            .then(data => {
+                let services = [];
+                data.forEach(doc => {
+                    let serviceTags = doc.data().tags;
+                    const filteredArray = tagArray.filter(value => serviceTags.includes(value));
+                    if (tagArray.length === filteredArray.length)
+                        services.push(doc.data());
                 })
+                response.json(services.slice((page - 1) * limit, (page - 1) * limit + limit));
             })
             .catch(err => {
                 return response.status(500).json({ error: `Error: ${err.code}` });
@@ -57,33 +37,13 @@ exports.discoverServices = (request, response) => {
     } else {
         db.collection('users')
             .where('type', '==', 'service')
-            .limit(limit)
             .get()
-            .then(documentSnapshots => {
-                var lastVisible = documentSnapshots.docs[documentSnapshots.docs.length-1];
-                db.collection("users")
-                    .where('type', '==', 'service')
-                    .startAt(lastVisible)
-                    .limit(staticData.SERVICES_PER_PAGE + 1)
-                    .get()
-                    .then(data =>
-                    {
-                        let services = [];
-                        data.forEach(doc => 
-                        {
-                            services.push(doc.data());
-                        })
-                        if(page === 1){
-                            services.pop();
-                        }else{
-                            services.shift(); 
-                        }
-                        return response.status(201).json(services);
-                    })
-                .catch(err =>
-                {
-                    return response.status(500).json({ error: `Error: ${err.code}` });
+            .then(data => {
+                let services = [];
+                data.forEach(doc => {
+                    services.push(doc.data());
                 })
+                response.json(services.slice((page - 1) * limit, (page - 1) * limit + limit));
             })
             .catch(err => {
                 return response.status(500).json({ error: `Error: ${err.code}` });
