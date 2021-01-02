@@ -302,7 +302,7 @@ Return structure:
 ## GET: `/discover`
 
 To retrieve a list of services nearby, use the `/discover` API
-This GET request requires a header with key `service`. It will then return a list of services that contain the tags that the user inputs. If no tags are entered, then the search displays all services. The search query gets narrower with the tags intersection as more tags are inputted by the user. The array is formed by comma separation.
+This GET request requires a header with key `service` and key `page` (for pagination). It will then return a list of services that contain the tags that the user inputs. If no tags are entered, then the search displays all services. The search query gets narrower with the tags intersection as more tags are inputted by the user. The array is formed by comma separation.
 
 Example: service: "DJ, Food Truck"
 
@@ -522,6 +522,40 @@ Sample Input
     "body": "Hello!",
     "userHandle": "matt8p"  (Whoever you're sending the connect to)
 }
+```
+
+Database format
+```
+{
+    "body": "Hello, I would like to use your service as a DJ",
+    "clientHandle": "matt8p",
+    "serviceHandle": "808hertz",
+    "createdAt": "2021-01-01T00:00:00",
+    "sentBy": "client"
+}
+```
+
+## GET: `/connect`
+
+Retrieve all connects from the database that were either sent or received by you
+
+sent: true if the connect was sent by the user requesting the API, false if it was received
+
+otherHandle: the handle of the user who did not request the API
+
+body: the message written by the sender
+
+date: date and time when the connect request was sent
+
+Return 
+```
+{
+    "sent": true,
+    otherHandle: "808hertz",
+    body: "Hello, I would like to use your service as a DJ",
+    date: "2021-01-01T00:00:00"
+}
+
 
 # Betas API
 
