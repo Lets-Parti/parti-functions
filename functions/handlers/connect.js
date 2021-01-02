@@ -103,15 +103,6 @@ exports.createConnect = (request, response) => {
         })
 }
 
-/*
-Format for response
-{
-    sent: true/false
-    body: connect.body
-    otherHandle: handle
-}
-*/
-
 exports.getConnects = (request, response) => {
     const userType = request.user.type;
     const userHandle = request.user.userHandle;
