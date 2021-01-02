@@ -130,7 +130,7 @@ exports.getConnects = (request, response) => {
                     sent: (userType === data.sentBy) ? true : false,
                     otherHandle: (userType === 'client') ? data.serviceHandle : data.clientHandle,
                     body: data.body,
-                    date: data.createdAt,
+                    date: data.createdAt
                 }
                 connects.push(connect);
             })
