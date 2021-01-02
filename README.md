@@ -522,6 +522,40 @@ Sample Input
     "body": "Hello!",
     "userHandle": "matt8p"  (Whoever you're sending the connect to)
 }
+```
+
+Database format
+```
+{
+    "body": "Hello, I would like to use your service as a DJ",
+    "clientHandle": "matt8p",
+    "serviceHandle": "808hertz",
+    "createdAt": "2021-01-01T00:00:00",
+    "sentBy": "client"
+}
+```
+
+## GET: `/connect`
+
+Retrieve all connects from the database that were either sent or received by you
+
+sent: true if the connect was sent by the user requesting the API, false if it was received
+
+otherHandle: the handle of the user who did not request the API
+
+body: the message written by the sender
+
+date: date and time when the connect request was sent
+
+Return 
+```
+{
+    "sent": true,
+    otherHandle: "808hertz",
+    body: "Hello, I would like to use your service as a DJ",
+    date: "2021-01-01T00:00:00"
+}
+
 
 # Betas API
 

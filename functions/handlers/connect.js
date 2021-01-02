@@ -25,7 +25,8 @@ exports.createConnect = (request, response) => {
     let connect_data =
     {
         createdAt: new Date().toISOString(),
-        body: body
+        body: body,
+        sentBy: userType
     }
 
     if (userType === 'client') {
@@ -103,6 +104,7 @@ exports.createConnect = (request, response) => {
 }
 
 exports.getConnects = (request, response) => {
+    const userType = request.user.type;
     const userHandle = request.user.userHandle;
     let isClient = request.user.type === 'client';
     let whichHandle = isClient ? 'clientHandle' : 'serviceHandle';
@@ -113,7 +115,15 @@ exports.getConnects = (request, response) => {
         .then(data => {
             let connects = [];
             data.forEach(doc => {
-                connects.push(doc.data());
+                let data = doc.data();
+                let connect = 
+                {
+                    sent: (userType === data.sentBy) ? true : false,
+                    otherHandle: (userType === 'client') ? data.serviceHandle : data.clientHandle,
+                    body: data.body,
+                    date: data.createdAt
+                }
+                connects.push(connect);
             })
             return response.status(201).json(connects);
         })
