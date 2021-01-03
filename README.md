@@ -525,6 +525,7 @@ Sample Input
 ```
 
 Database format
+
 ```
 {
     "body": "Hello, I would like to use your service as a DJ",
@@ -537,7 +538,7 @@ Database format
 
 ## GET: `/connect`
 
-Retrieve all connects from the database that were either sent or received by you
+Retrieve all connects from the database that were either sent or received by you. Requires Bearer Token.
 
 sent: true if the connect was sent by the user requesting the API, false if it was received
 
@@ -547,7 +548,8 @@ body: the message written by the sender
 
 date: date and time when the connect request was sent
 
-Return 
+Return
+
 ```
 {
     "sent": true,
