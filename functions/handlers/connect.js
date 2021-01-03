@@ -12,8 +12,8 @@ exports.createConnect = (request, response) => {
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'wearpartiapp@gmail.com',
-            pass: 'Asuxduke1!'
+            user: 'funpartiapp@gmail.com',
+            pass: 'funpartiapp1991'
         }
     })
 
@@ -52,7 +52,7 @@ exports.createConnect = (request, response) => {
                         emailBody =
                             `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/PartiLogotranmsparnet.png?alt=media&token=45f06ea2-e5bd-4039-9e5b-3e20ab7bd0ca" style="height: 100px;" alt="partilogo"></img>
                         <br>
-                        <b>${fullName} (@${from}) reached out to you!<b> <br><br>
+                        <b>${fullName} (@${from}) reached out to you!<b>. <br><br>
                         <p>${connect_data.body}</p>
                         <p>Here's my contact information: </p>
                         <p>${phone}</p>
@@ -63,14 +63,14 @@ exports.createConnect = (request, response) => {
                         emailBody =
                             `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/PartiLogotranmsparnet.png?alt=media&token=45f06ea2-e5bd-4039-9e5b-3e20ab7bd0ca" style="height: 100px;" alt="partilogo"></img>
                         <br>
-                        <b>${fullName} (@${from})reached out to you!<b>. <br><br>
+                        <b>${fullName} (@${from})reached out to you!<b> <br><br>
                         <p>${connect_data.body}</p>
                         <p>Here's my contact information: </p>
                         <p>${phone}</p>
                         <p>${emailFrom}</p>
                         <a href="https://parti.app/user/${from}">Click here to view ${from}'s profile</a>
                         <br>
-                        <i>We hope you're having a good experience. Create your event or view your contracts at Parti!</i>`;
+                        <i>We hope you're having a good experience. Create your event or view your contracts at Parti! Please do not reply to this email.</i>`;
                     }
 
                     db.doc(`/users/${to}`).get()
@@ -80,7 +80,7 @@ exports.createConnect = (request, response) => {
                             cors(request, response, () => {
                                 const mailOptions =
                                 {
-                                    from: 'Parti <wearepartiapp@gmail.com>',
+                                    from: 'Parti <funpartiapp@gmail.com>',
                                     to: emailTo,
                                     subject: `${fullName} Reached Out`,
                                     html: emailBody
