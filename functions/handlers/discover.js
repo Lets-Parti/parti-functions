@@ -60,6 +60,7 @@ exports.discoverEvents = (request, response) => {
 
     db.collection('events')
         .where('eventDate', '>', today)
+        .orderBy('createdAt', 'desc')
         .get()
         .then(data => {
             let services = [];

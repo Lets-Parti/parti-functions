@@ -50,7 +50,7 @@ exports.createConnect = (request, response) => {
 
                     if (userType === 'client') {
                         emailBody =
-                            `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/PartiLogotranmsparnet.png?alt=media&token=45f06ea2-e5bd-4039-9e5b-3e20ab7bd0ca" style="height: 100px;" alt="partilogo"></img>
+                        `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/PartiLogotranmsparnet.png?alt=media&token=45f06ea2-e5bd-4039-9e5b-3e20ab7bd0ca" style="height: 100px;" alt="partilogo"></img>
                         <br>
                         <b>${fullName} (@${from}) reached out to you!<b> <br><br>
                         <p>${connect_data.body}</p>
@@ -109,6 +109,7 @@ exports.getConnects = (request, response) => {
     let isClient = request.user.type === 'client';
     let whichHandle = isClient ? 'clientHandle' : 'serviceHandle';
     let otherHandle = !isClient ? 'clientHandle' : 'serviceHandle';
+
     db.collection('connects')
         .where(`${whichHandle}`, '==', `${userHandle}`)
         .get()
@@ -125,6 +126,14 @@ exports.getConnects = (request, response) => {
                 }
                 connects.push(connect);
             })
+
+            connects.sort((x, y) =>                                                                           //Sort the connects
+            {
+                if(x.date < y.date) return 1; 
+                if(x.date > y.date) return -1; 
+                return 0; 
+            })
+
             return response.status(201).json(connects);
         })
         .catch(err => {
