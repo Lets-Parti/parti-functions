@@ -62,7 +62,7 @@ exports.discoverEvents = (request, response) => {
         .where('eventDate', '>', today)
         .get()
         .then(data => {
-            let services = [];
+            let events = [];
 
             data.forEach((doc) => {
                 let servicesRequested = []
@@ -78,12 +78,20 @@ exports.discoverEvents = (request, response) => {
                 });
                 const filteredArray = tags.filter(value => servicesRequested.includes(value));
                 if (filteredArray.length > 0) {
-                    services.push(eventData);
+                    events.push(eventData);
                 }
             })
-            response.json(services);
+
+            events.sort((x, y) =>                                                                           //Sort the events by created date from newest to oldest 
+            {
+                if(x.createdAt < y.createdAt) return 1; 
+                if(x.createdAt > y.createdAt) return -1; 
+                return 0; 
+            })
+            
+            response.json(events);
         })
         .catch(err => {
-            return response.status(500).json({ error: 'shit went south' });
+            return response.status(500).json({ error: `${err.code}` });
         })
 }

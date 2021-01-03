@@ -1,5 +1,5 @@
 const staticData = {
-    SERVICES_PER_PAGE: 2,
+    SERVICES_PER_PAGE: 4,
 }
 
 module.exports = staticData

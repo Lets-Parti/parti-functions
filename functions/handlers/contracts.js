@@ -214,6 +214,12 @@ exports.getUserContracts = (request, response) =>
                 contract.totalCost = totalCost; 
                 contracts.push(contract); 
             })
+            contracts.sort((x, y) =>                                                                           //Sort the events by created date from newest to oldest 
+            {
+                if(x.createdAt < y.createdAt) return 1; 
+                if(x.createdAt > y.createdAt) return -1; 
+                return 0; 
+            })
             return response.status(201).json(contracts); 
         })
         .catch(err =>
