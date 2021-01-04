@@ -11,6 +11,8 @@ const { createContract, signContract, deleteContract, getUserContracts } = requi
 const { createConnect, getConnects } = require('./handlers/connect')
 const FirebaseAuth = require('./util/fbAuth');
 const { createBeta } = require('./handlers/beta');
+const { getUpdates } = require('./handlers/newsletter');
+
 
 const app = express()
 app.use(cors());
@@ -55,6 +57,7 @@ app.get('/connect', FirebaseAuth, getConnects)
 
 //beta routes
 app.post('/beta', createBeta);
+app.post('/newsletter', getUpdates)
 
 exports.api = functions.https.onRequest(app)
 
