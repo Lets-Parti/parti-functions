@@ -6,7 +6,6 @@ const axios = require('axios');
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
 const { user } = require('firebase-functions/lib/providers/auth');
-const parti_development = require('../util/config');
 
 exports.createConnect = (request, response) => {
     let transporter = nodemailer.createTransport({
