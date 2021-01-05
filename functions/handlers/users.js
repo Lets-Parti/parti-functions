@@ -109,6 +109,7 @@ exports.signup = (request, response) =>
             userInfoToDatabase.website = ''
             userInfoToDatabase.instagram = '' 
             userInfoToDatabase.facebook = ''
+            userInfoToDatabase.mediaOrder = []
         }
         return db.doc(dbPath).set(userInfoToDatabase)
     })
@@ -454,7 +455,7 @@ exports.updateUserProfile = (request, response) =>
     let newData = {
         zipcode: request.body.zipcode, 
         fullName: request.body.fullName,
-        phone: request.body.phone
+        phone: request.body.phone,
     }
 
     if(!newData.zipcode)
@@ -495,6 +496,8 @@ exports.updateUserProfile = (request, response) =>
         newData.website = request.body.website; 
         newData.instagram = request.body.instagram; 
         newData.facebook = request.body.facebook; 
+        mediaOrder= request.body.mediaOrder;
+
 
         
         if(!newData.tags)
