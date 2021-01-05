@@ -39,7 +39,7 @@ exports.signup = (request, response) =>
         errors.userHandle = 'Username cannot be empty'
     if(containsSpecialCharacters(newUser.userHandle))                       //UserHandle error handling 
         errors.userHandle = 'Username must not contain special characters'
-    if(newUser.userHandle != newUser.userHandle.toLowerCase())              //UserHandle error handling
+    if(newUser.userHandle !== newUser.userHandle.toLowerCase())              //UserHandle error handling
         errors.userHandle = 'Username must contain all lowercase letters' 
     if(!newUser.fullName || isEmpty(newUser.fullName))              //FullName error handling 
         errors.fullName = 'Full Name cannot be empty'
