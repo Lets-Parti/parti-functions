@@ -107,6 +107,9 @@ exports.signup = (request, response) =>
             userInfoToDatabase.service = newUser.service
             userInfoToDatabase.tags = [newUser.service]             
             userInfoToDatabase.mediaImages = []
+            userInfoToDatabase.website = ''
+            userInfoToDatabase.instagram = '' 
+            userInfoToDatabase.facebook = ''
         }
         return db.doc(dbPath).set(userInfoToDatabase)
     })
@@ -490,6 +493,11 @@ exports.updateUserProfile = (request, response) =>
     {
         newData.tags = request.body.tags;
         newData.bio = request.body.bio;
+        //Socials 
+        newData.website = request.body.website; 
+        newData.instagram = request.body.instagram; 
+        newData.facebook = request.body.facebook; 
+
         
         if(!newData.tags)
             errors.tags = 'Must contain tag object in request';   

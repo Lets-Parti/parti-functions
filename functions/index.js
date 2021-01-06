@@ -8,9 +8,11 @@ const { discoverServices, discoverEvents } = require('./handlers/discover');
 const { feedback } = require('./handlers/feedback');
 const { addReview } = require('./handlers/review');
 const { createContract, signContract, deleteContract, getUserContracts } = require('./handlers/contracts');
-const { createConnect } = require('./handlers/connect')
+const { createConnect, getConnects } = require('./handlers/connect')
 const FirebaseAuth = require('./util/fbAuth');
 const { createBeta } = require('./handlers/beta');
+const { getUpdates } = require('./handlers/newsletter');
+
 
 const app = express()
 app.use(cors());
@@ -51,9 +53,11 @@ app.post('/contracts/delete', FirebaseAuth, deleteContract);
 
 //connect routes 
 app.post('/connect', FirebaseAuth, createConnect)
+app.get('/connect', FirebaseAuth, getConnects)
 
 //beta routes
 app.post('/beta', createBeta);
+app.post('/newsletter', getUpdates)
 
 exports.api = functions.https.onRequest(app)
 
