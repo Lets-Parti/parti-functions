@@ -49,3 +49,8 @@ exports.usernameLimit = (str) => {
 exports.nameOfUserLimit = (str) => {
     return str.length > 30;
 }
+
+exports.isInstaHandle = (str) => {
+    const regex = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/igm;
+    return regex.test(String(str));
+}
