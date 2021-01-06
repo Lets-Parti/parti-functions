@@ -39,8 +39,6 @@ exports.signup = (request, response) =>
         errors.userHandle = 'Username cannot be empty'
     if(containsSpecialCharacters(newUser.userHandle))                       //UserHandle error handling 
         errors.userHandle = 'Username must not contain special characters'
-    if(newUser.userHandle !== newUser.userHandle.toLowerCase())              //UserHandle error handling
-        errors.userHandle = 'Username must contain all lowercase letters' 
     if(!newUser.fullName || isEmpty(newUser.fullName))              //FullName error handling 
         errors.fullName = 'Full Name cannot be empty'
     if(!isZipcode(newUser.zipcode))                                         //zipcode error handling 
@@ -64,7 +62,8 @@ exports.signup = (request, response) =>
         return response.status(400).json(errors);
 
     newUser.phone = getDigits(newUser.phone); 
-        
+    newUser.userHandle = newUser.userHandle.toLowerCase();
+
     const dbPath = `/users/${newUser.userHandle}`;
     const noImg = 'no_img.jpg';         
 
@@ -133,6 +132,7 @@ exports.login = (request, response) =>
         emailOrHandle: request.body.emailOrHandle, 
         password: request.body.password
     };
+    user.emailOrHandle = user.emailOrHandle.toLowerCase();
 
     let errors = {}
 
