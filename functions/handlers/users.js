@@ -63,6 +63,7 @@ exports.signup = (request, response) =>
 
     newUser.phone = getDigits(newUser.phone); 
     newUser.userHandle = newUser.userHandle.toLowerCase();
+    newUser.email = newUser.email.toLowerCase(); 
 
     const dbPath = `/users/${newUser.userHandle}`;
     const noImg = 'no_img.jpg';         
