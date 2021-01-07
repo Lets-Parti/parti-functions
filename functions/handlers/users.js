@@ -372,6 +372,11 @@ exports.uploadMediaImages = (request, response) =>
                 db.doc(dbPath).update({mediaImages})
                 .then(res =>
                 {
+                    let mediaOrder = doc.data().mediaOrder;
+                    mediaOrder.push(mediaImages.length-1)
+                    db.doc(dbPath).update({mediaOrder})
+
+
                     response.status(201).json({
                         message: 'Image ploaded successfully', 
                         url: `${imageUrl}`
@@ -426,12 +431,22 @@ exports.deleteMediaImage = (request, response) =>
             db.doc(dbPath).update({mediaImages})
             .then(() =>
             {
+                let mediaOrder = doc.data().mediaOrder;
+                mediaOrder.splice(mediaOrder.findIndex(position => position==targetIndex),1)
+                for (const [idx,position] of mediaOrder.entries()){
+                    if (position>targetIndex){
+                        mediaOrder[idx]-=1
+                    }
+                }
+                db.doc(dbPath).update({mediaOrder})
+
                 return response.status(201).json({message: `File ${imageFileName} deleted from doc`});
             })
             .catch(err=>
             {
                 return response.status(500).json({err: `Failed to delete file from Firebase`});
             })
+
         })
         .catch(err=>
         {
