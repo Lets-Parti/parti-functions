@@ -518,7 +518,6 @@ exports.updateUserProfile = (request, response) =>
         console.log(response);
         console.log(newData.instagram);
         console.log(`Updating service account: ${userHandle}`);
-        let website = newData.website;
         db.doc(dbPath).update(newData)
         .then(() =>
         {
