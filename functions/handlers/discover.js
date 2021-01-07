@@ -1,9 +1,5 @@
-const { admin, db } = require('../util/admin');
-const firebase = require('firebase');
-const config = require('../util/config');
+const { db } = require('../util/admin');
 const staticData = require('../util/static-data')
-const { isEmail, isEmpty, isZipcode, containsSpecialCharacters } = require('../util/validators');
-const axios = require('axios');
 
 exports.discoverServices = (request, response) => {
     const service = request.headers.service;
@@ -17,38 +13,30 @@ exports.discoverServices = (request, response) => {
 
     const limit = staticData.SERVICES_PER_PAGE;
 
-    if (service.length > 0) {
-        db.collection('users')
-            .where('type', '==', 'service')
-            .get()
-            .then(data => {
-                let services = [];
+    db.collection('users')
+        .where('type', '==', 'service')
+        .get()
+        .then(data => {
+            let services = [];
+            if(services.length > 0)                                              //If search Query exists
+            {
                 data.forEach(doc => {
                     let serviceTags = doc.data().tags;
                     const filteredArray = tagArray.filter(value => serviceTags.includes(value));
                     if (tagArray.length === filteredArray.length)
                         services.push(doc.data());
                 })
-                response.json(services.slice((page - 1) * limit, (page - 1) * limit + limit));
-            })
-            .catch(err => {
-                return response.status(500).json({ error: `Error: ${err.code}` });
-            })
-    } else {
-        db.collection('users')
-            .where('type', '==', 'service')
-            .get()
-            .then(data => {
-                let services = [];
+            }else
+            {
                 data.forEach(doc => {
                     services.push(doc.data());
                 })
-                response.json(services.slice((page - 1) * limit, (page - 1) * limit + limit));
-            })
-            .catch(err => {
-                return response.status(500).json({ error: `Error: ${err.code}` });
-            })
-    }
+            }
+            response.json(services.slice((page - 1) * limit, (page - 1) * limit + limit));
+        })
+        .catch(err => {
+            return response.status(500).json({ error: `Error: ${err.code}` });
+        })
 }
 
 exports.discoverEvents = (request, response) => {
