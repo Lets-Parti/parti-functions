@@ -51,7 +51,7 @@ exports.signup = (request, response) =>
         errors.confirmPassword = 'Passwords must match';
     if(!isPhone(newUser.phone))
         errors.phone = 'Invalid phone number. (10-digit number)'
-    if(bioExceedLimit(newUser.bio))
+    if(newUser.bio && bioExceedLimit(newUser.bio))
         errors.bio = 'User bio cannot exceed 500 characters'
     if(nameOfUserLimit(newUser.fullName))
         errors.fullName = 'Full name cannot exceed 30 characters'
@@ -521,4 +521,33 @@ exports.updateUserProfile = (request, response) =>
             return response.status(500).json({error: `Could not update information for service ${userHandle}`});
         })
     }
+}
+
+exports.userHandleLowerCase = (request, response) =>
+{
+    const userHandle = request.body.userHandle;
+    let newUserHandle = userHandle.toLowerCase(); 
+    const dbPath = `/users/${userHandle}`
+    const newdbPath = `/users/${newUserHandle}`;
+
+    db.doc(dbPath).get()
+    .then(doc =>
+    {
+        if(!doc.exists) return response.status(500).json({err: `Handle ${userHandle} doesn't exist`});
+        const userData = doc.data(); 
+        
+        db.doc(newdbPath).set(userData)
+        .then(() =>
+        {
+            return response.status(201).json({message: `New document /users/${newUserHandle} created`});
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    })
+    .catch(err =>
+    {
+        return response.status(500).json({err});
+    })
 }
