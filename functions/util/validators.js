@@ -32,6 +32,11 @@ exports.getDigits = (str) => {
     return str1.slice(0,3) + "-" + str1.slice(3,6) + "-" + str1.slice(6);
 }
 
+exports.isInstagram = (str) => {
+    const regex=/(?:@)([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)/ig
+    return regex.test(str)
+}
+
 exports.bioExceedLimit = (str) => {
     return str.length > 500;
 }
