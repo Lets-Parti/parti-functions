@@ -432,7 +432,7 @@ exports.deleteMediaImage = (request, response) =>
             .then(() =>
             {
                 let mediaOrder = doc.data().mediaOrder;
-                mediaOrder.splice(mediaOrder.findIndex(position => position==targetIndex),1)
+                mediaOrder.splice(mediaOrder.findIndex(pos => pos==targetIndex),1)
                 for (const [idx,position] of mediaOrder.entries()){
                     if (position>targetIndex){
                         mediaOrder[idx]-=1
@@ -511,10 +511,9 @@ exports.updateUserProfile = (request, response) =>
         newData.website = request.body.website; 
         newData.instagram = request.body.instagram; 
         newData.facebook = request.body.facebook; 
-        mediaOrder= request.body.mediaOrder;
+        newData.mediaOrder= request.body.mediaOrder;
 
 
-        
         if(!newData.tags)
             errors.tags = 'Must contain tag object in request';   
         if(!newData.bio)
@@ -539,4 +538,35 @@ exports.updateUserProfile = (request, response) =>
             return response.status(500).json({error: `Could not update information for service ${userHandle}`});
         })
     }
+}
+
+exports.saveMediaOrder = (request,response) =>
+{
+    let newData={
+        mediaOrder: request.body.mediaOrder
+    }
+
+    const userHandle = request.user.userHandle; 
+    const type = request.user.type; 
+
+    if(type !== 'service')
+        return response.status(500).json({type: 'User type must be of type service'});
+
+    if (!newData.mediaOrder && newData.mediaOrder!==[]){
+        return response.status(500).json({error: `No media order available`});
+    }
+    const dbPath = `/users/${userHandle}`;
+
+    console.log(`Updating service account media order: ${userHandle}`);
+    db.doc(dbPath).update(newData)
+    .then(() =>
+    {
+        return response.status(201).json({message: `Service ${userHandle} updated with new media order`});
+    })
+    .catch(err =>
+    {
+        return response.status(500).json({error: `Could not media order for service ${userHandle}`});
+    })
+
+
 }

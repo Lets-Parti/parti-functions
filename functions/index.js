@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors')
 
 const { createEvent, getUsersEvents, getEventByID } = require('./handlers/events');
-const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage } = require('./handlers/users');
+const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage, saveMediaOrder } = require('./handlers/users');
 const { discoverServices, discoverEvents } = require('./handlers/discover');
 const { feedback } = require('./handlers/feedback');
 const { addReview } = require('./handlers/review');
@@ -34,6 +34,8 @@ app.post('/account/edit', FirebaseAuth, updateUserProfile)
 app.post('/user/image', FirebaseAuth, uploadProfileImage);
 app.post('/user/services/media', FirebaseAuth, uploadMediaImages);
 app.post('/user/services/media/delete', FirebaseAuth, deleteMediaImage);
+app.post('/user/services/media/save_order', FirebaseAuth, saveMediaOrder);
+
 
 // TODO: Aaric is working on this
 app.post('/review/', FirebaseAuth, addReview);
