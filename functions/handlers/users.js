@@ -62,7 +62,9 @@ exports.signup = (request, response) =>
         return response.status(400).json(errors);
 
     newUser.phone = getDigits(newUser.phone); 
-        
+    newUser.userHandle = newUser.userHandle.toLowerCase();
+    newUser.email = newUser.email.toLowerCase(); 
+
     const dbPath = `/users/${newUser.userHandle}`;
     const noImg = 'no_img.jpg';         
 
@@ -134,6 +136,7 @@ exports.login = (request, response) =>
         emailOrHandle: request.body.emailOrHandle, 
         password: request.body.password
     };
+    user.emailOrHandle = user.emailOrHandle.toLowerCase();
 
     let errors = {}
 
