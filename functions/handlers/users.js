@@ -399,7 +399,7 @@ exports.deleteMediaImage = (request, response) =>
     const targetIndex = request.body.index; 
     const userHandle = request.user.userHandle; 
     const type = request.user.type; 
-    console.log(targetIndex)
+
     if(type !== 'service')
         return response.status(500).json({type: 'User type must be of type service'});
     const dbPath = `/users/${userHandle}`;
@@ -408,14 +408,12 @@ exports.deleteMediaImage = (request, response) =>
     .then(doc =>
     {
         let mediaImages = doc.data().mediaImages; 
-        if(targetIndex >= mediaImages.length)
+        if(targetIndex >= mediaImages.length || targetIndex < 0)
             return response.status(500).json({error: 'Index out of bounds'});
-        let targetImageURL = mediaImages[targetIndex];
-        let imageFileName = targetImageURL.split('https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/')[1];
-        imageFileName = imageFileName.split('?')[0];
 
-        console.log('getting ref'); 
-        console.log(imageFileName); 
+        let targetImageURL = mediaImages[targetIndex];
+        let imageFileName = targetImageURL.split(`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/`)[1];
+        imageFileName = imageFileName.split('?')[0];
 
         let file = admin.storage().bucket().file(imageFileName); 
         file.delete()
