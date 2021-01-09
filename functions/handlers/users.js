@@ -2,14 +2,12 @@ const {admin, db} = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
 const {isEmail, isEmpty, isZipcode, containsSpecialCharacters, isPhone, getDigits, bioExceedLimit, usernameLimit, nameOfUserLimit} = require('../util/validators');
-const { user, service } = require('firebase-functions/lib/providers/auth');
 
 //Image upload modules
 const BusBoy = require('busboy');
 const path = require('path'); 
 const os = require('os'); 
 const fs = require('fs'); 
-const { response } = require('express');
 
 firebase.initializeApp(config); 
 
@@ -139,7 +137,6 @@ exports.login = (request, response) =>
     user.emailOrHandle = user.emailOrHandle.toLowerCase();
 
     let errors = {}
-
     if(isEmpty(user.emailOrHandle)) errors.emailOrHandle = 'Form must not be empty'; 
     if(isEmpty(user.password)) errors.password = 'Password must not be empty';
 
@@ -523,7 +520,6 @@ exports.updateUserProfile = (request, response) =>
         })
     }
 }
-
 
 // DO NOT USE
 // This is a method that modifies the DB manually
