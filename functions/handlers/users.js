@@ -524,6 +524,9 @@ exports.updateUserProfile = (request, response) =>
     }
 }
 
+
+// DO NOT USE
+// This is a method that modifies the DB manually
 exports.userHandleLowerCase = (request, response) =>
 {
     const userHandle = request.body.userHandle;

@@ -13,7 +13,6 @@ const FirebaseAuth = require('./util/fbAuth');
 const { createBeta } = require('./handlers/beta');
 const { getUpdates } = require('./handlers/newsletter');
 
-
 const app = express()
 app.use(cors());
 
@@ -27,7 +26,7 @@ app.post('/signup', signup);
 app.post('/login', login);
 app.get('/user/:userhandle', getUserByHandle);
 app.get('/user', FirebaseAuth, getAuthenticatedUser);
-app.post('/lowercase', userHandleLowerCase);
+// app.post('/lowercase', userHandleLowerCase);
 
 //TODO: Matt & Aaric
 app.post('/account/edit', FirebaseAuth, updateUserProfile)
