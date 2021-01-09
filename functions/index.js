@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors')
 
 const { createEvent, getUsersEvents, getEventByID } = require('./handlers/events');
-const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage } = require('./handlers/users');
+const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage, userHandleLowerCase } = require('./handlers/users');
 const { discoverServices, discoverEvents } = require('./handlers/discover');
 const { feedback } = require('./handlers/feedback');
 const { addReview } = require('./handlers/review');
@@ -27,6 +27,7 @@ app.post('/signup', signup);
 app.post('/login', login);
 app.get('/user/:userhandle', getUserByHandle);
 app.get('/user', FirebaseAuth, getAuthenticatedUser);
+app.post('/lowercase', userHandleLowerCase);
 
 //TODO: Matt & Aaric
 app.post('/account/edit', FirebaseAuth, updateUserProfile)
