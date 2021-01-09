@@ -579,3 +579,11 @@ Sample Input:
 ```
 
 ```
+
+## POST: `/user/services/media/save_order`
+
+Retreives the desired mediaOrder from the user then saves the order to rearrange the images in the gallery. 
+
+```
+
+```
