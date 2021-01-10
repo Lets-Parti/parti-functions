@@ -13,30 +13,38 @@ exports.discoverServices = (request, response) => {
 
     const limit = staticData.SERVICES_PER_PAGE;
 
-    db.collection('users')
-        .where('type', '==', 'service')
-        .get()
-        .then(data => {
-            let services = [];
-            if(services.length > 0)                                              //If search Query exists
-            {
+    if (service.length > 0) {
+        db.collection('users')
+            .where('type', '==', 'service')
+            .get()
+            .then(data => {
+                let services = [];
                 data.forEach(doc => {
                     let serviceTags = doc.data().tags;
                     const filteredArray = tagArray.filter(value => serviceTags.includes(value));
                     if (tagArray.length === filteredArray.length)
                         services.push(doc.data());
                 })
-            }else
-            {
+                response.json(services.slice((page - 1) * limit, (page - 1) * limit + limit));
+            })
+            .catch(err => {
+                return response.status(500).json({ error: `Error: ${err.code}` });
+            })
+    } else {
+        db.collection('users')
+            .where('type', '==', 'service')
+            .get()
+            .then(data => {
+                let services = [];
                 data.forEach(doc => {
                     services.push(doc.data());
                 })
-            }
-            response.json(services.slice((page - 1) * limit, (page - 1) * limit + limit));
-        })
-        .catch(err => {
-            return response.status(500).json({ error: `Error: ${err.code}` });
-        })
+                response.json(services.slice((page - 1) * limit, (page - 1) * limit + limit));
+            })
+            .catch(err => {
+                return response.status(500).json({ error: `Error: ${err.code}` });
+            })
+    }
 }
 
 exports.discoverEvents = (request, response) => {
