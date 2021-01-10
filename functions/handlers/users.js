@@ -337,7 +337,7 @@ exports.uploadMediaImages = (request, response) =>
 
     busboy.on('file', (fieldname, file, filename, encoding, mimetype) =>
     {
-        if(mimetype !== 'image/jpeg' || mimetype !== 'image/png')
+        if(mimetype !== 'image/jpeg' && mimetype !== 'image/png')
             return response.status(400).json({ error: 'Wrong file type submitted'});
 
         const imageExtention = filename.split('.')[filename.split('.').length - 1].toLowerCase();     //Get the file type (.png, .jpt, ext)
@@ -515,8 +515,6 @@ exports.updateUserProfile = (request, response) =>
         {
             return response.status(500).json(errors); 
         }
-        console.log(response);
-        console.log(newData.instagram);
         console.log(`Updating service account: ${userHandle}`);
         db.doc(dbPath).update(newData)
         .then(() =>
