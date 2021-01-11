@@ -1,7 +1,7 @@
 const {admin, db} = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
-const {isEmail, isEmpty, isZipcode, containsSpecialCharacters, isPhone, getDigits, bioExceedLimit, usernameLimit, nameOfUserLimit, isInstaHandle} = require('../util/validators');
+const {isEmail, isEmpty, isZipcode, containsSpecialCharacters, isPhone, getDigits, bioExceedLimit, usernameLimit, nameOfUserLimit} = require('../util/validators');
 const { user, service } = require('firebase-functions/lib/providers/auth');
 
 //Image upload modules
