@@ -2,14 +2,12 @@ const {admin, db} = require('../util/admin');
 const firebase = require('firebase');
 const config = require('../util/config');
 const {isEmail, isEmpty, isZipcode, containsSpecialCharacters, isPhone, getDigits, bioExceedLimit, usernameLimit, nameOfUserLimit} = require('../util/validators');
-const { user, service } = require('firebase-functions/lib/providers/auth');
 
 //Image upload modules
 const BusBoy = require('busboy');
 const path = require('path'); 
 const os = require('os'); 
 const fs = require('fs'); 
-const { response } = require('express');
 
 firebase.initializeApp(config); 
 
@@ -51,7 +49,7 @@ exports.signup = (request, response) =>
         errors.confirmPassword = 'Passwords must match';
     if(!isPhone(newUser.phone))
         errors.phone = 'Invalid phone number. (10-digit number)'
-    if(bioExceedLimit(newUser.bio))
+    if(newUser.bio && bioExceedLimit(newUser.bio))
         errors.bio = 'User bio cannot exceed 500 characters'
     if(nameOfUserLimit(newUser.fullName))
         errors.fullName = 'Full name cannot exceed 30 characters'
@@ -63,6 +61,7 @@ exports.signup = (request, response) =>
 
     newUser.phone = getDigits(newUser.phone); 
     newUser.userHandle = newUser.userHandle.toLowerCase();
+    newUser.email = newUser.email.toLowerCase(); 
 
     const dbPath = `/users/${newUser.userHandle}`;
     const noImg = 'no_img.jpg';         
@@ -138,7 +137,6 @@ exports.login = (request, response) =>
     user.emailOrHandle = user.emailOrHandle.toLowerCase();
 
     let errors = {}
-
     if(isEmpty(user.emailOrHandle)) errors.emailOrHandle = 'Form must not be empty'; 
     if(isEmpty(user.password)) errors.password = 'Password must not be empty';
 
@@ -401,7 +399,7 @@ exports.deleteMediaImage = (request, response) =>
     const targetIndex = request.body.index; 
     const userHandle = request.user.userHandle; 
     const type = request.user.type; 
-    console.log(targetIndex)
+
     if(type !== 'service')
         return response.status(500).json({type: 'User type must be of type service'});
     const dbPath = `/users/${userHandle}`;
@@ -410,14 +408,12 @@ exports.deleteMediaImage = (request, response) =>
     .then(doc =>
     {
         let mediaImages = doc.data().mediaImages; 
-        if(targetIndex >= mediaImages.length)
+        if(targetIndex >= mediaImages.length || targetIndex < 0)
             return response.status(500).json({error: 'Index out of bounds'});
-        let targetImageURL = mediaImages[targetIndex];
-        let imageFileName = targetImageURL.split('https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/')[1];
-        imageFileName = imageFileName.split('?')[0];
 
-        console.log('getting ref'); 
-        console.log(imageFileName); 
+        let targetImageURL = mediaImages[targetIndex];
+        let imageFileName = targetImageURL.split(`https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/`)[1];
+        imageFileName = imageFileName.split('?')[0];
 
         let file = admin.storage().bucket().file(imageFileName); 
         file.delete()
@@ -497,21 +493,24 @@ exports.updateUserProfile = (request, response) =>
         newData.website = request.body.website; 
         newData.instagram = request.body.instagram; 
         newData.facebook = request.body.facebook; 
-
         
         if(!newData.tags)
             errors.tags = 'Must contain tag object in request';   
         if(!newData.bio)
             errors.bio = 'Must contain bio object in request';
-
         if(newData.tags && !Array.isArray(newData.tags))
             errors.tags = 'tag object must be of type Array';
+        if(newData.website && (newData.website.includes('https://') || newData.website.includes('http://'))){
+            newData.website = "https://" + newData.website;
+        }
+        if(newData.instagram && newData.instagram.includes('@')){
+            errors.instagram = 'Instagram handle invalid';
+        }
 
         if(Object.keys(errors).length > 0)
         {
             return response.status(500).json(errors); 
         }
-
         console.log(`Updating service account: ${userHandle}`);
         db.doc(dbPath).update(newData)
         .then(() =>
@@ -523,4 +522,35 @@ exports.updateUserProfile = (request, response) =>
             return response.status(500).json({error: `Could not update information for service ${userHandle}`});
         })
     }
+}
+
+// DO NOT USE
+// This is a method that modifies the DB manually
+exports.userHandleLowerCase = (request, response) =>
+{
+    const userHandle = request.body.userHandle;
+    let newUserHandle = userHandle.toLowerCase(); 
+    const dbPath = `/users/${userHandle}`
+    const newdbPath = `/users/${newUserHandle}`;
+
+    db.doc(dbPath).get()
+    .then(doc =>
+    {
+        if(!doc.exists) return response.status(500).json({err: `Handle ${userHandle} doesn't exist`});
+        const userData = doc.data(); 
+        
+        db.doc(newdbPath).set(userData)
+        .then(() =>
+        {
+            return response.status(201).json({message: `New document /users/${newUserHandle} created`});
+        })
+        .catch(err =>
+        {
+            return response.status(500).json({err});
+        })
+    })
+    .catch(err =>
+    {
+        return response.status(500).json({err});
+    })
 }

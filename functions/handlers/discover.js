@@ -4,6 +4,8 @@ const config = require('../util/config');
 const staticData = require('../util/static-data')
 const { isEmail, isEmpty, isZipcode, containsSpecialCharacters } = require('../util/validators');
 const axios = require('axios');
+const { db } = require('../util/admin');
+const staticData = require('../util/static-data')
 
 exports.discoverServices = (request, response) => {
     const service = request.headers.service;
