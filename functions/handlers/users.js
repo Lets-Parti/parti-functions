@@ -498,15 +498,13 @@ exports.updateUserProfile = (request, response) =>
             errors.tags = 'Must contain tag object in request';   
         if(!newData.bio)
             errors.bio = 'Must contain bio object in request';
-
         if(newData.tags && !Array.isArray(newData.tags))
             errors.tags = 'tag object must be of type Array';
-        if(newData.website && (newData.website.includes("https://") || newData.website.includes("http://"))){
-            //errors.website = 'Include https:// or http:// at beginning of website';
+        if(newData.website && (newData.website.includes('https://') || newData.website.includes('http://'))){
             newData.website = "https://" + newData.website;
         }
         if(newData.instagram && newData.instagram.includes('@')){
-            errors.insta = 'Instagram handle invalid';
+            errors.instagram = 'Instagram handle invalid';
         }
 
         if(Object.keys(errors).length > 0)
