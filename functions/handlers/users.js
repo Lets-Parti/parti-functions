@@ -503,11 +503,11 @@ exports.updateUserProfile = (request, response) =>
 
         if(newData.tags && !Array.isArray(newData.tags))
             errors.tags = 'tag object must be of type Array';
-        if(newData.website && (!newData.website.includes("https") && !newData.website.includes("http"))){
+        if(newData.website && (newData.website.includes("https://") || newData.website.includes("http://"))){
             //errors.website = 'Include https:// or http:// at beginning of website';
             newData.website = "https://" + newData.website;
         }
-        if(newData.instagram && !isInstaHandle(newData.instagram)){
+        if(newData.instagram && newData.instagram.includes('@')){
             errors.insta = 'Instagram handle invalid';
         }
 
