@@ -493,7 +493,6 @@ exports.updateUserProfile = (request, response) =>
         newData.website = request.body.website; 
         newData.instagram = request.body.instagram; 
         newData.facebook = request.body.facebook; 
-
         
         if(!newData.tags)
             errors.tags = 'Must contain tag object in request';   
@@ -502,12 +501,18 @@ exports.updateUserProfile = (request, response) =>
 
         if(newData.tags && !Array.isArray(newData.tags))
             errors.tags = 'tag object must be of type Array';
+        if(newData.website && (newData.website.includes("https://") || newData.website.includes("http://"))){
+            //errors.website = 'Include https:// or http:// at beginning of website';
+            newData.website = "https://" + newData.website;
+        }
+        if(newData.instagram && newData.instagram.includes('@')){
+            errors.insta = 'Instagram handle invalid';
+        }
 
         if(Object.keys(errors).length > 0)
         {
             return response.status(500).json(errors); 
         }
-
         console.log(`Updating service account: ${userHandle}`);
         db.doc(dbPath).update(newData)
         .then(() =>
