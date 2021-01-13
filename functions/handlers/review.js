@@ -25,15 +25,17 @@ exports.addReview = (request, response) => {
       return response.status(500).json({error: `User isn't a client`});
     
     let serviceBeingReviewed = request.body.userHandle
+
     let addReview = {   
-        userHandle: request.user.userHandle,
+        author_userHandle: request.body.author_userHandle,
+        author_fullName: request.body.author_fullName,
         stars: request.body.stars,
-        body: request.body.body
+        body: request.body.body,
+        source: request.body.source, 
+        source_url: request.body.source_url
     };
 
     let errors = {}; 
-    if(!addReview.body || isEmpty(addReview.body)) 
-        errors.body = "Review cannot be empty"
     if(!serviceBeingReviewed || isEmpty(serviceBeingReviewed)) 
         errors.userHandle = "User Handle cannot be empty"
     if(!addReview.stars || addReview.stars < 0 || addReview.stars > 5)
@@ -54,21 +56,13 @@ exports.addReview = (request, response) => {
             return response.status(500).json({error: `User ${serviceBeingReviewed} must be of type service `});
 
         let reviews = doc.data().reviews; 
-        for (let i = 0; i < reviews.reviews.length; i++) {
-          if (reviews.reviews[i].userHandle === addReview.userHandle) {
+        for (let i = 0; i < reviews.length; i++) {
+          if (reviews[i].author_userHandle === addReview.author_userHandle) {
             return response.status(500).json({message: 'You have already created a review'});
           }
         }
         
-        reviews.reviews.push(addReview)
-        reviews.numberOfReviews++
-        
-        let sumOfStars = 0; 
-        reviews.reviews.forEach(rev =>
-        {
-            sumOfStars += rev.stars
-        })             
-        reviews.averageStars = Math.round((sumOfStars / reviews.numberOfReviews) * 10) / 10; 
+        reviews.push(addReview)
 
         db.doc(dbPath).update({reviews})
         .then(() =>
