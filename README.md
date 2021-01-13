@@ -332,11 +332,16 @@ Example: service: "DJ, Food Truck"
             "Live Band",
             "Food Catering"
         ],
-        "reviews": {
-            "numberOfReviews": 0,
-            "averageStars": 0,
-            "reviews": []
-        },
+        "reviews": [
+            {
+                author_name: "Matthew Wang",
+                author_userHandle: "",
+                rating: 5,
+                body: "Best DJ Company",
+                source: "Google Reviews",
+                source_url: "https://google.com"
+            }
+        ],
         "service": "DJ",
         "phone": "480-480-4800",
         "type": "service",
