@@ -530,6 +530,19 @@ Sample input:
 }
 ```
 
+## Post: /review/edit
+
+** Edit Review **. The API requires a Bearer token of client type.
+Sample input:
+
+```
+{
+    userHandle: 808hertz,
+    rating: 5,
+    body: "Best Company Here"
+}
+```
+
 # Connect API
 
 ## POST: `/connect`

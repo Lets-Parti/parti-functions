@@ -60,7 +60,7 @@ exports.addReview = (request, response) => {
         let reviews = doc.data().reviews; 
         for (let i = 0; i < reviews.length; i++) {
           if (reviews[i].author_userHandle === addReview.author_userHandle) {
-            return response.status(500).json({message: 'You have already created a review'});
+            return response.status(500).json({message: `${addReview.author_userHandle} has already created a review`});
           }
         }
         
@@ -116,8 +116,8 @@ exports.editReview = (request, response) => {
       errors.body = "Review cannot be empty"
   if(!serviceBeingReviewed || isEmpty(serviceBeingReviewed)) 
       errors.userHandle = "User Handle cannot be empty"
-  if(!addReview.stars || addReview.stars < 0 || addReview.stars > 5)
-      errors.stars = 'Invalid Star Rating'
+  if(!addReview.rating || addReview.rating < 0 || addReview.rating > 5)
+      errors.rating = 'Invalid Star Rating'
   
   if(Object.keys(errors).length > 0)
   {
