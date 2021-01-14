@@ -22,8 +22,10 @@ module.exports = (request, response, next) =>
     .then(data =>
     {
         request.user.userHandle = data.docs[0].data().userHandle; 
+        request.user.fullName = data.docs[0].data().fullName; 
         request.user.type = data.docs[0].data().type; 
         request.user.zipcode = data.docs[0].data().zipcode; 
+        request.user.imageUrl = data.docs[0].data().imageUrl; 
 
         if(data.docs[0].data().type === 'service')
         {

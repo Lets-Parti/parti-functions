@@ -96,11 +96,7 @@ If successfull the response will return the user's basic information
 {
     "user": {
         "email": "808hertz@gmail.com",
-        "reviews": {
-            "reviews": [],
-            "averageStars": 0,
-            "numberOfReviews": 0
-        },
+        "reviews": [],
         "fullName": "808Hertz Entertainment",
         "userID": "hH72cr8FK0d48efuxdP3Gm8v3Y72",
         "type": "service",
@@ -336,10 +332,12 @@ Example: service: "DJ, Food Truck"
             {
                 author_name: "Matthew Wang",
                 author_userHandle: "",
+                author_photo_url: "https:/parti.com/img.jpg",
                 rating: 5,
                 body: "Best DJ Company",
                 source: "Google Reviews",
-                source_url: "https://google.com"
+                source_url: "https://google.com",
+                createdAt: "2020-12-09T18:50:12.956Z"
             }
         ],
         "service": "DJ",
@@ -513,6 +511,22 @@ Sample input:
 ```
 {
     "contractID": "v5AFaMcYsIOGfjKdoJ0i"
+}
+```
+
+# Reviews API
+
+## POST: /review
+
+** Create a new review **. The API requires a Bearer token of client type.
+
+Sample input:
+
+```
+{
+    userHandle: 808hertz,
+    rating: 5,
+    body: "Best Company Here"
 }
 ```
 
