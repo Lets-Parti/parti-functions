@@ -96,12 +96,7 @@ exports.signup = (request, response) =>
 
         if(newUser.type === 'service')                              //Add extra information for service account types 
         {
-            userInfoToDatabase.reviews = 
-            {
-                numberOfReviews: 0, 
-                averageStars: 0, 
-                reviews: []
-            }
+            userInfoToDatabase.reviews = []
             userInfoToDatabase.bio = newUser.bio
             userInfoToDatabase.service = newUser.service
             userInfoToDatabase.tags = [newUser.service]             

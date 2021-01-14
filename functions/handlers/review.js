@@ -25,19 +25,23 @@ exports.addReview = (request, response) => {
       return response.status(500).json({error: `User isn't a client`});
     
     let serviceBeingReviewed = request.body.userHandle
+
     let addReview = {   
-        userHandle: request.user.userHandle,
-        stars: request.body.stars,
-        body: request.body.body
+        author_userHandle: request.user.userHandle,
+        author_fullName: request.user.fullName,
+        profile_photo_url: request.user.imageUrl, 
+        rating: request.body.rating,
+        body: request.body.body,
+        source: 'Parti', 
+        source_url: `https://parti.app/user/${serviceBeingReviewed}`, 
+        createdAt: new Date().toISOString()
     };
 
     let errors = {}; 
-    if(!addReview.body || isEmpty(addReview.body)) 
-        errors.body = "Review cannot be empty"
     if(!serviceBeingReviewed || isEmpty(serviceBeingReviewed)) 
         errors.userHandle = "User Handle cannot be empty"
-    if(!addReview.stars || addReview.stars < 0 || addReview.stars > 5)
-        errors.stars = 'Invalid Star Rating'
+    if(!addReview.rating || addReview.rating < 0 || addReview.rating > 5)
+        errors.rating = 'Invalid Star Rating'
     
     if(Object.keys(errors).length > 0)
     {
@@ -54,21 +58,13 @@ exports.addReview = (request, response) => {
             return response.status(500).json({error: `User ${serviceBeingReviewed} must be of type service `});
 
         let reviews = doc.data().reviews; 
-        for (let i = 0; i < reviews.reviews.length; i++) {
-          if (reviews.reviews[i].userHandle === addReview.userHandle) {
-            return response.status(500).json({message: 'You have already created a review'});
+        for (let i = 0; i < reviews.length; i++) {
+          if (reviews[i].author_userHandle === addReview.author_userHandle) {
+            return response.status(500).json({message: `${addReview.author_userHandle} has already created a review`});
           }
         }
         
-        reviews.reviews.push(addReview)
-        reviews.numberOfReviews++
-        
-        let sumOfStars = 0; 
-        reviews.reviews.forEach(rev =>
-        {
-            sumOfStars += rev.stars
-        })             
-        reviews.averageStars = Math.round((sumOfStars / reviews.numberOfReviews) * 10) / 10; 
+        reviews.push(addReview)
 
         db.doc(dbPath).update({reviews})
         .then(() =>
@@ -105,9 +101,14 @@ exports.editReview = (request, response) => {
   
   let serviceBeingReviewed = request.body.userHandle
   let addReview = {   
-      userHandle: request.user.userHandle,
-      stars: request.body.stars,
-      body: request.body.body
+    author_userHandle: request.user.userHandle,
+    author_fullName: request.user.fullName,
+    profile_photo_url: request.user.imageUrl, 
+    rating: request.body.rating,
+    body: request.body.body,
+    source: 'Parti', 
+    source_url: `https://parti.app/user/${serviceBeingReviewed}`, 
+    createdAt: new Date().toISOString()
   };
 
   let errors = {}; 
@@ -115,8 +116,8 @@ exports.editReview = (request, response) => {
       errors.body = "Review cannot be empty"
   if(!serviceBeingReviewed || isEmpty(serviceBeingReviewed)) 
       errors.userHandle = "User Handle cannot be empty"
-  if(!addReview.stars || addReview.stars < 0 || addReview.stars > 5)
-      errors.stars = 'Invalid Star Rating'
+  if(!addReview.rating || addReview.rating < 0 || addReview.rating > 5)
+      errors.rating = 'Invalid Star Rating'
   
   if(Object.keys(errors).length > 0)
   {
@@ -133,22 +134,16 @@ exports.editReview = (request, response) => {
           return response.status(500).json({error: `User ${serviceBeingReviewed} must be of type service `});
 
       let reviews = doc.data().reviews; 
+
       let editCheck = -1;
-      for (let i = 0; i < reviews.reviews.length; i++) {
-        if (reviews.reviews[i].userHandle === addReview.userHandle) {
+      for (let i = 0; i < reviews.length; i++) {
+        if (reviews[i].author_userHandle === addReview.author_userHandle) {
           editCheck = i;
         }
       }
+
       if (editCheck !== -1) {
-        reviews.reviews[editCheck] = addReview;
-
-        let sumOfStars = 0; 
-        reviews.reviews.forEach(rev =>
-        {
-            sumOfStars += rev.stars
-        })             
-        reviews.averageStars = Math.round((sumOfStars / reviews.numberOfReviews) * 10) / 10;
-
+        reviews[editCheck] = addReview;
         db.doc(dbPath).update({reviews})
         .then(() => 
         {
