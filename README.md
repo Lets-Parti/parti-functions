@@ -530,7 +530,7 @@ Sample input:
 }
 ```
 
-## Post: /review/edit
+## POST: /review/edit
 
 ** Edit Review **. The API requires a Bearer token of client type.
 Sample input:
@@ -542,6 +542,26 @@ Sample input:
     body: "Best Company Here"
 }
 ```
+
+## POST: /review/import
+
+** Import Review **. The API does not require a Bearer token. This API is for developer use only. Manually import a review
+for a user.
+
+Sample input:
+
+```
+{
+    "userHandle": "808hertz",
+    "rating": 3,
+    "author_fullName": "K. Lewis",
+    "body": "808Hertz did an amazing job DJing our neighborhood block party. They were reasonably priced. I would highly recommend them for your next event!",
+    "source": "808hertz website",
+    "source_url": "http://808hertz.com"
+}
+```
+
+`source` is the source of the review. `source_url` is the link that'll take you to the full review.
 
 # Connect API
 
