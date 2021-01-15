@@ -159,3 +159,56 @@ exports.editReview = (request, response) => {
       return response.status(500).json({error: err});
   })
 }
+
+exports.importReview = (request, response) => {
+  const noImg = 'no_img.jpg';   
+  
+  let serviceBeingReviewed = request.body.userHandle
+
+  let addReview = {   
+      author_userHandle: '',
+      author_fullName: request.body.author_fullName,
+      profile_photo_url: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`, 
+      rating: request.body.rating,
+      body: request.body.body,
+      source: request.body.source, 
+      source_url: request.body.source_url, 
+      createdAt: new Date().toISOString()
+  };
+
+  let errors = {}; 
+  if(!serviceBeingReviewed || isEmpty(serviceBeingReviewed)) 
+      errors.userHandle = "User Handle cannot be empty"
+  if(!addReview.rating || addReview.rating < 0 || addReview.rating > 5)
+      errors.rating = 'Invalid Star Rating'
+  if(!addReview.source || isEmpty(addReview.source))
+      errors.source = 'Source cannot be empty'
+  
+  if(Object.keys(errors).length > 0)
+  {
+      return response.status(500).json(errors); 
+  }    
+  
+  const dbPath = `/users/${serviceBeingReviewed}`;
+  db.doc(dbPath).get()
+  .then(doc => 
+  {
+      if(!doc.exists)
+          return response.status(500).json({error: `User ${serviceBeingReviewed} doesn't exist `});
+      if(doc.data().type !== 'service')
+          return response.status(500).json({error: `User ${serviceBeingReviewed} must be of type service `});
+
+      let reviews = doc.data().reviews; 
+      reviews.push(addReview);
+
+      db.doc(dbPath).update({reviews})
+      .then(() =>
+      {
+          return response.status(201).json({message: 'Review Successfully Created'});
+      })       
+  })
+  .catch(err =>
+  {
+      return response.status(500).json({error: err});
+  })
+}

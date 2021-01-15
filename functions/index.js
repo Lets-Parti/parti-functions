@@ -6,7 +6,7 @@ const { createEvent, getUsersEvents, getEventByID } = require('./handlers/events
 const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage, userHandleLowerCase } = require('./handlers/users');
 const { discoverServices, discoverEvents } = require('./handlers/discover');
 const { feedback } = require('./handlers/feedback');
-const { addReview, editReview } = require('./handlers/review');
+const { addReview, editReview, importReview } = require('./handlers/review');
 const { createContract, signContract, deleteContract, getUserContracts } = require('./handlers/contracts');
 const { createConnect, getConnects } = require('./handlers/connect')
 const FirebaseAuth = require('./util/fbAuth');
@@ -37,7 +37,8 @@ app.post('/user/services/media/delete', FirebaseAuth, deleteMediaImage);
 
 // TODO: Aaric is working on this
 app.post('/review', FirebaseAuth, addReview);
-app.post('/review/edit', FirebaseAuth, editReview)
+app.post('/review/edit', FirebaseAuth, editReview);
+app.post('/review/import', importReview);
 
 // discover routes
 app.get('/discover', discoverServices); 
