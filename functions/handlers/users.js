@@ -26,7 +26,9 @@ exports.signup = (request, response) =>
         confirmPassword: request.body.confirmPassword,
         type: request.body.type, 
         bio: request.body.bio, 
-        service: request.body.service
+        service: request.body.service, 
+        city: "Greater Phoenix",
+        state: "AZ"
     };
 
     console.log(newUser); 
