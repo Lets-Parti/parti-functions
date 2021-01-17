@@ -26,9 +26,7 @@ exports.signup = (request, response) =>
         confirmPassword: request.body.confirmPassword,
         type: request.body.type, 
         bio: request.body.bio, 
-        service: request.body.service, 
-        city: "Greater Phoenix",
-        state: "AZ"
+        service: request.body.service
     };
 
     console.log(newUser); 
@@ -93,7 +91,9 @@ exports.signup = (request, response) =>
             type: newUser.type, 
             createdAt: new Date().toISOString(), 
             events: [], 
-            imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`
+            imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
+            city: "Greater Phoenix",
+            state: "AZ"
         }
 
         if(newUser.type === 'service')                              //Add extra information for service account types 
