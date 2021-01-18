@@ -49,7 +49,7 @@ exports.createConnect = (request, response) => {
 
                     if (userType === 'client') {
                         emailBody =
-                        `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/PartiLogotranmsparnet.png?alt=media&token=45f06ea2-e5bd-4039-9e5b-3e20ab7bd0ca" style="height: 100px;" alt="partilogo"></img>
+                        `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/PartiLogo.jpg?alt=media&token=a88d5679-1f5b-4111-b5c0-753b82fe84ac" style="height: 100px;" alt="partilogo"></img>
                         <br>
                         <b>${fullName} (@${from}) reached out to you!<b> <br><br>
                         <p>${connect_data.body}</p>
@@ -60,7 +60,7 @@ exports.createConnect = (request, response) => {
                         <i>We hope you're having a good experience. Create your event or view your contracts at Parti! Please do not reply to this email.</i>`;
                     } else if (userType === 'service') {
                         emailBody =
-                            `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/PartiLogotranmsparnet.png?alt=media&token=45f06ea2-e5bd-4039-9e5b-3e20ab7bd0ca" style="height: 100px;" alt="partilogo"></img>
+                            `<img src="https://firebasestorage.googleapis.com/v0/b/lets-parti.appspot.com/o/PartiLogo.jpg?alt=media&token=a88d5679-1f5b-4111-b5c0-753b82fe84ac" style="height: 100px;" alt="partilogo"></img>
                         <br>
                         <b>${fullName} (@${from})reached out to you!<b> <br><br>
                         <p>${connect_data.body}</p>
