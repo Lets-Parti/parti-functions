@@ -158,7 +158,8 @@ exports.login = (request, response) =>
                 })
                 .then(token => 
                 {
-                    return response.status(201).json({token})
+                    const userType = doc.data().type; 
+                    return response.status(201).json({token, userType});
                 })
                 .catch(err =>
                 {
