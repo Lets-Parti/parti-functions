@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors')
 
-const { createEvent, getUsersEvents, getEventByID } = require('./handlers/events');
+const { createEvent, deleteEvent,getUsersEvents, getEventByID } = require('./handlers/events');
 const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage, userHandleLowerCase } = require('./handlers/users');
 const { discoverServices, discoverEvents } = require('./handlers/discover');
 const { feedback } = require('./handlers/feedback');
@@ -20,6 +20,7 @@ app.use(cors());
 app.get('/events', FirebaseAuth, getUsersEvents);
 app.get('/events/:eventID', FirebaseAuth, getEventByID);
 app.post('/events', FirebaseAuth, createEvent);
+app.post('/events/delete',FirebaseAuth,deleteEvent)
 
 // user routes 
 app.post('/signup', signup);
