@@ -256,7 +256,7 @@ exports.deleteEvent = (request, response) => {
                 .json({ message: "Event deleted succesfully" });
             })
             .catch((err) => {
-              return response.status(500).json({ error: err });
+              return response.status(500).json({ error: err, message: "Event not deleted" });
             });
         })
         .catch((err) => {
