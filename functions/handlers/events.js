@@ -123,12 +123,7 @@ exports.getEventByID = (request, response) => {
 };
 
 exports.createEvent = (request, response) => {
-  if (request.user.type !== "client") {
-    return response
-      .status(500)
-      .json({ error: "Account type must be client to create an event." });
-  }
-
+  
   const newEvent = {
     title: request.body.title,
     userHandle: request.user.userHandle,
