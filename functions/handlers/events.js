@@ -8,118 +8,84 @@ const {
   eventTitleLimit,
 } = require("../util/validators");
 
-exports.getUsersEvents = (request, response) => {
-  if (request.user.type !== "client")
-    return response
-      .status(500)
-      .json({ error: "Must be of type client to get the users events" });
+exports.getAllEvents = (request, response) => {
+  db.collection("events")
+  .get()
+  .then((data) => {
+    let events = [];
+    data.forEach((doc) => {
+      let thisDocumentData = doc.data();
+      events.push(thisDocumentData);
+    });
 
-  const userHandle = request.user.userHandle;
-  const dbPath = `/users/${userHandle}`;
-
-  db.doc(dbPath)
-    .get()
-    .then((doc) => {
-      if (!doc.exists) {
-        return response
-          .status(500)
-          .json({ error: `Database path ${dbPath} does not exist ` });
-      } else {
-        const eventIDs = doc.data().events;
-
-        db.collection("events")
-          .where("__name__", "in", eventIDs)
-          .get()
-          .then((data) => {
-            let events = [];
-            data.forEach((doc) => {
-              let thisDocumentData = doc.data();
-              events.push(thisDocumentData);
-            });
-
-            events.sort(
-              (
-                x,
-                y //Sort the events by created date from newest to oldest
-              ) => {
-                if (x.createdAt < y.createdAt) return 1;
-                if (x.createdAt > y.createdAt) return -1;
-                return 0;
-              }
-            );
-
-            return response.json(events);
-          })
-          .catch((err) => {
-            console.error(err.code);
-            return response.status(500).json({
-              error: `Could not retrieve events for event ids ${eventIDs}`,
-            });
-          });
+    events.sort(
+      (
+        x,
+        y //Sort the events by created date from newest to oldest
+      ) => {
+        if (x.createdAt < y.createdAt) return 1;
+        if (x.createdAt > y.createdAt) return -1;
+        return 0;
       }
+    );
+    return response.json(events);
+  })
+  .catch((err) => {
+    console.error(err.code);
+    return response.status(500).json({
+      error: `Could not retrieve events ${err}`,
+    });
+  });
+}
+
+exports.getEventsByUser = (request, response) => {
+  const userHandle = request.params.userHandle;
+
+  db.collection("events")
+    .where("userHandle", "==", userHandle)
+    .get()
+    .then((data) => {
+      let events = [];
+      data.forEach((doc) => {
+        let thisDocumentData = doc.data();
+        events.push(thisDocumentData);
+      });
+
+      events.sort(
+        (
+          x,
+          y //Sort the events by created date from newest to oldest
+        ) => {
+          if (x.createdAt < y.createdAt) return 1;
+          if (x.createdAt > y.createdAt) return -1;
+          return 0;
+        }
+      );
+      return response.json(events);
     })
     .catch((err) => {
       console.error(err.code);
-      return response
-        .status(500)
-        .json({ error: `Could not find events for ${userHandle}` });
+      return response.status(500).json({
+        error: `Could not retrieve events ${err}`,
+      });
     });
 };
 
 exports.getEventByID = (request, response) => {
   const eventID = request.params.eventID;
-  const userType = request.user.type;
-  const userHandle = request.user.userHandle;
 
-  if (userType === "client") {
-    db.doc(`/users/${userHandle}`)
-      .get()
-      .then((doc) => {
-        let userEvents = doc.data().events;
-        if (!userEvents.includes(eventID))
-          return response.status(500).json({
-            event: `User ${userHandle} cannot access event ${eventID}`,
-          });
-
-        db.doc(`/events/${eventID}`)
-          .get()
-          .then((doc) => {
-            if (!doc.exists)
-              return response
-                .status(500)
-                .json({ error: `Event ${eventID} does not exist` });
-            return response.status(201).json(doc.data());
-          });
-      })
-      .catch((err) => {
-        return response.status(500).json({ err });
-      });
-  } else if (userType === "service") {
-    db.doc(`/events/${eventID}`)
-      .get()
-      .then((doc) => {
-        if (!doc.exists)
-          return response
-            .status(500)
-            .json({ error: `Event ${eventID} does not exist` });
-
-        let docData = doc.data();
-        let services = docData.services;
-        services.forEach((service) => {
-          if (
-            service.service !== null &&
-            service.service.userHandle !== userHandle
-          ) {
-            service.service.contractID = "redacted";
-            service.service.userHandle = "redacted";
-          }
-        });
-        return response.status(201).json(docData);
-      })
-      .catch((err) => {
-        return response.status(500).json({ err });
-      });
-  }
+  db.doc(`/events/${eventID}`)
+  .get()
+  .then((doc) => {
+    if (!doc.exists)
+      return response
+        .status(500)
+        .json({ error: `Event ${eventID} does not exist` });
+    return response.status(201).json(doc.data());
+  })
+  .catch((err) => {
+    return response.status(500).json({ err });
+  });
 };
 
 exports.createEvent = (request, response) => {
@@ -127,6 +93,7 @@ exports.createEvent = (request, response) => {
   const newEvent = {
     title: request.body.title,
     userHandle: request.user.userHandle,
+    fullName: request.user.fullName, 
     description: request.body.description,
     createdAt: new Date().toISOString(),
     eventDate: request.body.eventDate,
