@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const express = require('express');
 const cors = require('cors')
 
-const { getAllEvents, createEvent, deleteEvent, getEventsByUser, getEventByID, getEventByUser } = require('./handlers/events');
+const { getAllEvents, createEvent, deleteEvent, getEventsByUser, getEventByID, getEventByUser, toggleServiceStatus } = require('./handlers/events');
 const { signup, login, uploadProfileImage, getUserByHandle, getAuthenticatedUser, uploadMediaImages, updateUserProfile, deleteMediaImage, userHandleLowerCase } = require('./handlers/users');
 const { discoverServices, discoverEvents } = require('./handlers/discover');
 const { feedback } = require('./handlers/feedback');
@@ -21,7 +21,8 @@ app.get('/events', getAllEvents)
 app.get('/events/user/:userHandle', getEventsByUser);
 app.get('/events/:eventID', getEventByID);
 app.post('/events', FirebaseAuth, createEvent);
-app.post('/events/delete',FirebaseAuth,deleteEvent)
+app.post('/events/toggle', FirebaseAuth, toggleServiceStatus);
+app.post('/events/delete', FirebaseAuth, deleteEvent);
 
 // user routes 
 app.post('/signup', signup);

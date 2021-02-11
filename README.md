@@ -326,6 +326,21 @@ Example with parameter `userHandle = "808hertz
     }
 ```
 
+## POST `/events/toggle`
+
+** Toggle the status of a service of a given event **.
+Specify the vendor's full name, type of service you're toggling, and the eventID
+
+```
+{
+    "vendorFullName": "808Hertz",
+    "serviceType": "DJ",
+    "eventID": "GfsZsLRs7fAHVjuyRT31"
+}
+```
+
+The vendor is the person that the client has hired for the given service type. This will toggle the database. If there is a vendor for service x, it will set it to null. If there is not a vendor found for service x, it will set the vendor to be the service x provider.
+
 ## GET: `/discover`
 
 To retrieve a list of services nearby, use the `/discover` API

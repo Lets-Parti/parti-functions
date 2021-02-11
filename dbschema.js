@@ -56,16 +56,16 @@ let CloudFirestoreDB =
                 {
                     serviceType: 'DJ',
                     description: 'I need a DJ for my party',
-                    vendorFound: true,
                     service: {
                         userHandle: '{userHandle of the vendor}',
-                        contract: '{contractID}'
+                        fullName: '{Full name of the vendor}',
+                        imageUrl: '{image url of vendor}'
+                        // contract: '{contractID}'
                     }
                 },
                 {
                     serviceType: 'Photography',
                     description: 'I need a Photographer for my party',
-                    vendorFound: false,
                     service: {}
                 }
             ]

@@ -7,6 +7,8 @@ const {
   serviceRequestLimit,
   eventTitleLimit,
 } = require("../util/validators");
+const config = require('../util/config');
+const e = require("express");
 
 exports.getAllEvents = (request, response) => {
   db.collection("events")
@@ -167,6 +169,67 @@ exports.createEvent = (request, response) => {
         .json({ error: `Failed to add new event to /events database ${err}` });
     });
 };
+
+exports.toggleServiceStatus = (request, response) => {
+  const noImg = "no_img.jpg";
+  let userHandle = request.user.userHandle; 
+  let vendorFullName = request.body.vendorFullName; 
+  let serviceType = request.body.serviceType; 
+  let eventID = request.body.eventID; 
+
+  db.doc(`/events/${eventID}`).get()
+  .then(doc =>
+  { 
+      if(!doc.exists)
+      {
+        return response.status(500).json({error: `Event ${eventID} does not exist`});
+      }
+
+      let data = doc.data(); 
+      if(data.userHandle != userHandle)
+      {
+        return response.status(500).json({error: `User ${userHandle} does not have permission to modify event ${eventID}`});
+      }
+
+      let services = data.services; 
+      let found = false; 
+      services.forEach(service =>
+      {
+        if(service.serviceType == serviceType)
+        {
+          found = true; 
+          if(service.service != null)
+          {
+            service.service = null; 
+          }else
+          {
+            service.service = {
+              'fullName': vendorFullName,
+              'imageUrl': `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`,
+              'userHandle': null
+            }
+          }
+        }
+      });
+      
+      if(!found)
+      {
+        return response.status(500).json({err: `Service ${serviceType} not found for event ${eventID}`});
+      }
+
+      return db.collection("events").doc(eventID).update({services})
+  })      
+  .then(() =>
+  {
+      return response.status(201).json({message: `${serviceType} service for event ${eventID} toggled successfully.`}); 
+  })
+  .catch(err =>
+  {
+      return response.status(500).json({err}); 
+  })
+}
+
+
 
 exports.deleteEvent = (request, response) => {
   if (request.user.type !== "client") {
