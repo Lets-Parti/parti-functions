@@ -96,6 +96,7 @@ exports.createEvent = (request, response) => {
     title: request.body.title,
     userHandle: request.user.userHandle,
     fullName: request.user.fullName, 
+    userImageUrl: request.user.imageUrl,
     description: request.body.description,
     createdAt: new Date().toISOString(),
     eventDate: request.body.eventDate,
