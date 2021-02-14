@@ -235,7 +235,7 @@ Example Response:
 
 ## GET: `/events`
 
-**Get the list of events of a given user**. A Bearer token is required to specify who the user is.
+**Retrieve the data for ALL events**.
 
 Return structure:
 
@@ -248,6 +248,8 @@ Return structure:
         "createdAt": "2020-11-30T22:49:32.565Z",
         "eventDate": "2021-01-12T00:00:00",
         "zipcode": "85286",
+        "userHandle": "matt8p",
+        "fullName": "Matthew Wang",
         "services": [
             {
                 "service": null,
@@ -276,7 +278,7 @@ Return structure:
 
 ## GET `/events/:eventID`
 
-** Get event information by eventID **. A Bearer token is required. If a service calls the API, the service names will be redacted. If a client calls the API, it will only return the event if the event belongs to the client.
+** Get event information by eventID **.
 
 ```
     {
@@ -285,6 +287,8 @@ Return structure:
         "description": "Mom's 20th!",
         "createdAt": "2020-11-30T22:49:32.565Z",
         "eventDate": "2021-01-12T00:00:00",
+        "userHandle": "808hertz",
+        "fullName": "808Hertz Entertainment"
         "zipcode": "85286",
         "services": [
             {
@@ -295,6 +299,47 @@ Return structure:
         ]
     }
 ```
+
+## GET `/events/user/:userHandle`
+
+** Get the event information for a given userHandle **.
+
+Example with parameter `userHandle = "808hertz
+
+```
+    {
+        "eventID": "DCkKbWVxGDbO8sVCpfuZ",
+        "title": "Mom's Anniversary",
+        "description": "Mom's 20th!",
+        "createdAt": "2020-11-30T22:49:32.565Z",
+        "eventDate": "2021-01-12T00:00:00",
+        "userHandle": "808hertz",
+        "fullName": "808Hertz Entertainment"
+        "zipcode": "85286",
+        "services": [
+            {
+                "service": null,
+                "serviceType": "Photographer",
+                "description": "I need a cool photographer"
+            }
+        ]
+    }
+```
+
+## POST `/events/toggle`
+
+** Toggle the status of a service of a given event **.
+Specify the vendor's full name, type of service you're toggling, and the eventID
+
+```
+{
+    "vendorFullName": "808Hertz",
+    "serviceType": "DJ",
+    "eventID": "GfsZsLRs7fAHVjuyRT31"
+}
+```
+
+The vendor is the person that the client has hired for the given service type. This will toggle the database. If there is a vendor for service x, it will set it to null. If there is not a vendor found for service x, it will set the vendor to be the service x provider.
 
 ## GET: `/discover`
 
